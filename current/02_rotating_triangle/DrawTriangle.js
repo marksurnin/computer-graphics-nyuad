@@ -3,7 +3,7 @@ var gl; // global variable
 var vertices;
 var vBuffer, vColor, cBuffer;
 var ut;
-
+	
 window.onload = function init() {
 	// Set up WebGL
 	var canvas = document.getElementById("gl-canvas");
