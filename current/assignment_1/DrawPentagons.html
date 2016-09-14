@@ -10,11 +10,15 @@
     <script type="text/javascript" src="DrawPentagons.js"></script> 
 
     <script id="vertex-shader" type="x-shader/x-vertex">
-      attribute vec4 vPosition;
+      attribute vec4 vPosition1;
+      attribute vec4 vPosition2;
+      attribute vec4 vColor;
+      varying vec4;
       uniform float t;
+
       void main(){
-        float x = vPosition.x;
-        float y = vPosition.y;
+        float x = vPosition1.x;
+        float y = vPosition1.y;
         float x1 = x * cos(t) - y * sin(t);
         float y1 = x * sin(t) + y * cos(t);
         gl_Position = vec4(x1, y1, 0, 1);
@@ -25,7 +29,7 @@
       precision mediump float;
 
       void main(){
-        gl_FragColor = vec4( 0.0, 0.0, 1.0, 1.0 );
+        gl_FragColor = vec4( 1.0, 0.5, 0.45, 1.0 );
       }
     </script>
   </head>
