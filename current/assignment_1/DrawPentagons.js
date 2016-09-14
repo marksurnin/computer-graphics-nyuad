@@ -1,10 +1,9 @@
 "use strict";
 
-var gl; // global variable
+var gl;
 var ut, idLoc, id;
 var vertices1, vertices2;
 var vBuffer1, vBuffer2;
-// var vColor, cBuffer;
 var vPosition;
 
 window.onload = function init() {
@@ -21,7 +20,6 @@ window.onload = function init() {
   var program = initShaders( gl, "vertex-shader", "fragment-shader" );
   gl.useProgram( program );
   
-
   // Generate points for two pentagons;
   vertices1 = [];
   vertices2 = [];
@@ -33,10 +31,6 @@ window.onload = function init() {
     vertices2.push(r2*Math.cos(t)+0.6, r2*Math.sin(t));
   }
 
-  // Define two colors.
-  var colors = [1.0, 0.5, 0.45,
-                0.4, 0.6, 1.0 ];
-
   // Create buffers.
   vBuffer1 = gl.createBuffer();
   vBuffer2 = gl.createBuffer();
@@ -45,6 +39,7 @@ window.onload = function init() {
   vPosition = gl.getAttribLocation(program, "vPosition");
   gl.enableVertexAttribArray(vPosition);
   
+  // Query the corresponding uniform variables in the shaders.
   ut = gl.getUniformLocation(program, "t");
   idLoc = gl.getUniformLocation(program, "id");
 
@@ -57,7 +52,7 @@ function render(now) {
   // Current time in seconds.
   var t = now*0.001;
 
-  // ut – uniform variable
+  // uniform1f – floating point variable.
   gl.uniform1f(ut, t);
 
   gl.clear(gl.COLOR_BUFFER_BIT);

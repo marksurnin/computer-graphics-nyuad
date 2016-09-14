@@ -11,9 +11,8 @@
 
     <script id="vertex-shader" type="x-shader/x-vertex">
       attribute vec4 vPosition;
-      attribute vec4 vColor;
-      varying vec4;
       uniform float t;
+      // Takes the value 0.0 or 1.0, which ditinguishes between the pentagons.
       uniform float id;
 
       void main(){
@@ -30,10 +29,15 @@
     </script>
 
     <script id="fragment-shader" type="x-shader/x-fragment">
-      precision mediump float;
+      precision highp float;
+      uniform float id;
 
       void main(){
-        gl_FragColor = vec4( 1.0, 0.5, 0.45, 1.0 );
+        if (id == 0.0) {
+          gl_FragColor = vec4( 0.4, 0.6, 1.0, 1.0 );
+        } else if (id == 1.0) {
+          gl_FragColor = vec4( 1.0, 0.5, 0.45, 1.0 );
+        }
       }
     </script>
   </head>
