@@ -75,7 +75,8 @@ window.onload = function init() {
 			var tail = vec2(1.0, -0.2);
 
 			// Call the main kochCurve function. Works well with values in the range {1, 4}.
-			vertices = kochCurve(head, tail, 4);
+			var levels = 4;
+			vertices = kochCurve(head, tail, levels);
 
 			// Load data into a buffer
 			var vBuffer = gl.createBuffer();
