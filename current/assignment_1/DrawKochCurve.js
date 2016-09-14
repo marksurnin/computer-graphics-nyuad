@@ -2,6 +2,7 @@
 var gl; // global variable
 var vertices = [];
 
+// Recursive function that generates 3 additional vertices of a Koch Curve based on the endpoints.
 function kochCurve(a, b, levels) {
 	var points = [];
 	var result = [];
