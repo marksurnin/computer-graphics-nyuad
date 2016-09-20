@@ -24,12 +24,14 @@ window.onload = function init() {
 			var axiom = "F";
 
 			var production_rules = {
-				// F: "F[+F]F[-F]F"		  	//axiom:F, alpha = pi/8	
+				F: "F[+F]F[-F]F"		  	//axiom:F, alpha = pi/8	
 				// F: "FF+F+F+FF+F+F-F"    	//axiom:F, alpha = pi/2
-				//F: "F+F-F-FF+F+F-F"      	//axiom:F, alpha = pi/2
+				// F: "F+F-F-FF+F+F-F"      	//axiom:F, alpha = pi/2
 				//F: "FF+[+F-F-F]-[-F+F+F]" //axiom:F, alpha = pi/8
-				//F: "FF", X:"F[+X]F[-X]+X" //axiom:X, alpha = pi/9
-				F: "F+F-F"    	//axiom:F, alpha = pi/2
+				// F: "FF", X:"F[+X]F[-X]+X" //axiom:X, alpha = pi/9
+				// F: "F+F-F"    	//axiom:F, alpha = pi/2
+				// F: "F[+F]-F"
+
 			};
 
 			var num_productions = 5;
@@ -51,52 +53,68 @@ window.onload = function init() {
 			
 			// Draw 
 			var num_vertices = v.length/2;
-			gl.drawArrays(gl.LINE_STRIP, 0, num_vertices); 
+			gl.drawArrays(gl.LINES, 0, num_vertices); 
 };
 
-function turtle(initial_config, alpha, axiom, production_rules, num_productions) {
-	// console.log(initial_config, alpha, axiom, production_rules, num_productions);
+function turtle(initial_config, alpha, axiom, production_rules, num_productions) {	
 	
-
-	// Initialize the points array and append the starting point coordinates.
+	// Initialize the points array, the newpoint, basepoint and statepoint objects.
 	var points = [];
-	points = points.concat(initial_config.x, initial_config.y);
-	// var direction = initial_config.theta;
+	var newpoint = {}
+	var basepoint = {};
+	var statepoint = {};
 
 	// Convert the production_rules string into an array of characters.
 	var instructions = production_rules.F;
 	instructions = instructions.split('');
 
-	var basepoint = clone(initial_config);
-	var statepoint = {};
+	// Copy the initial x, y coordinates and the theta into basepoint.
+	basepoint = clone(initial_config);
 
 	instructions.forEach(function(instruction, i) {
-		console.log(instruction, basepoint);
-		var newpoint = {};
+		newpoint = {};
 		switch (instruction) {
 			case 'F':
+				// Push the start point of the line segment to the points array.
+				points.push(basepoint.x, basepoint.y);
+
+				// Calculcate and push the end point of the line segment to the points array.
 				newpoint.x = basepoint.x + Math.cos(basepoint.theta);
 				newpoint.y = basepoint.y + Math.sin(basepoint.theta);
 				points.push(newpoint.x, newpoint.y);
 
+				// Update the basepoint coordinates.
 				basepoint.x = newpoint.x;
 				basepoint.y = newpoint.y;
 
 				break;
+
+			// Turn to the right.	
 			case '+':
 				basepoint.theta -= alpha;
 				break;
+
+			// Turn to the left.
 			case '-':
 				basepoint.theta += alpha;
 				break;
+
+			// Save current state.	
+			case '[':
+				statepoint = clone(basepoint);
+				break;
+
+			// Retrieve saved state.
+			case ']':
+				basepoint = clone(statepoint);
+				break;
+
+			// Default action: skip uknown instruction.	
 			default:
-				return;
+				break;
 		}
 	});
 
-	// var points = [];
-	// points.push(-0.9,0,0.9,0);
-	console.log(points);
 	points = normalize(points);
 	return points;
 }
@@ -126,11 +144,13 @@ function normalize(v) {
 	var xrange = xmax - xmin;
 	var yrange = ymax - ymin;
 	var s = 1.9/Math.max(xrange, yrange);
+
   for (i=0; i<v.length; i+=2) {
   	v[i] = s*(v[i] - xmid);
   }
   for (i=1; i<v.length; i+=2) {
   	v[i] = s*(v[i] - ymid);
   }
+
 	return v;
 }
