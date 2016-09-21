@@ -24,12 +24,12 @@ window.onload = function init() {
 			var axiom = "F";
 
 			var production_rules = {
-				F: "F[+F]F[-F]F"		  	//axiom:F, alpha = pi/8	
+				// F: "F[+F]F[-F]F"		  	//axiom:F, alpha = pi/8	
 				// F: "FF+F+F+FF+F+F-F"    	//axiom:F, alpha = pi/2
 				// F: "F+F-F-FF+F+F-F"      	//axiom:F, alpha = pi/2
 				//F: "FF+[+F-F-F]-[-F+F+F]" //axiom:F, alpha = pi/8
 				// F: "FF", X:"F[+X]F[-X]+X" //axiom:X, alpha = pi/9
-				// F: "F+F-F"    	//axiom:F, alpha = pi/2
+				F: "F+f-F"    	//axiom:F, alpha = pi/2
 				// F: "F[+F]-F"
 
 			};
@@ -74,6 +74,19 @@ function turtle(initial_config, alpha, axiom, production_rules, num_productions)
 	instructions.forEach(function(instruction, i) {
 		newpoint = {};
 		switch (instruction) {
+			// Move forward by distance 1 without drawing anything.
+			case 'f':
+				// Caclulate the coordinates of the new point.
+				newpoint.x = basepoint.x + Math.cos(basepoint.theta);
+				newpoint.y = basepoint.y + Math.sin(basepoint.theta);
+
+				// Update the basepoint coordinates.
+				basepoint.x = newpoint.x;
+				basepoint.y = newpoint.y;
+				
+				break;
+
+			// Move forward by distance 1 while drawing a line segment from the old position to the new position
 			case 'F':
 				// Push the start point of the line segment to the points array.
 				points.push(basepoint.x, basepoint.y);
