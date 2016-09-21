@@ -21,15 +21,15 @@ window.onload = function init() {
 
 			var alpha = Math.PI/8;
 
-			var axiom = "FS";
+			var axiom = "F";
 
 			var production_rules = {
-				S: "F[+F]F[-F]F"		  	//axiom:F, alpha = pi/8	
-				// F: "FF+F+F+FF+F+F-F"    	//axiom:F, alpha = pi/2
+				F: "F[+F[-F]+F]F[-F]F"		  	//axiom:F, alpha = pi/8	
+				// F: "FF+F+F+FF+F+F-F"    		//axiom:F, alpha = pi/2
 				// F: "F+F-F-FF+F+F-F"      	//axiom:F, alpha = pi/2
 				//F: "FF+[+F-F-F]-[-F+F+F]" //axiom:F, alpha = pi/8
-				// F: "FF", X:"F[+X]F[-X]+X" //axiom:X, alpha = pi/9
-				// F: "F+f-F"    	//axiom:F, alpha = pi/2
+				// F: "FF", X:"F[+X]F[-X]+X"	//axiom:X, alpha = pi/9
+				// F: "F+f-F"									//axiom:F, alpha = pi/2
 				// F: "F[+F]-F"
 
 			};
@@ -38,8 +38,6 @@ window.onload = function init() {
 
 			var v = turtle(initial_config, alpha, axiom, 
 			                      production_rules, num_productions);
-
-			// console.log(v);
 
 			// Load data into a buffer
 			var vBuffer = gl.createBuffer();
@@ -60,6 +58,7 @@ function turtle(initial_config, alpha, axiom, production_rules, num_productions)
 
 	// Initialize the points array, the newpoint, basepoint and statepoint objects.
 	var points = [];
+	var states = [];
 	var newpoint = {}
 	var basepoint = {};
 	var statepoint = {};
@@ -127,10 +126,12 @@ function turtle(initial_config, alpha, axiom, production_rules, num_productions)
 			// Save current state.	
 			case '[':
 				statepoint = clone(basepoint);
+				states.push(statepoint);
 				break;
 
 			// Retrieve saved state.
 			case ']':
+				statepoint = states.pop();
 				basepoint = clone(statepoint);
 				break;
 
