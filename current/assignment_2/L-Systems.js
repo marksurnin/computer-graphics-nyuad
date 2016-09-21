@@ -21,15 +21,15 @@ window.onload = function init() {
 
 			var alpha = Math.PI/8;
 
-			var axiom = "F";
+			var axiom = "FS";
 
 			var production_rules = {
-				// F: "F[+F]F[-F]F"		  	//axiom:F, alpha = pi/8	
+				S: "F[+F]F[-F]F"		  	//axiom:F, alpha = pi/8	
 				// F: "FF+F+F+FF+F+F-F"    	//axiom:F, alpha = pi/2
 				// F: "F+F-F-FF+F+F-F"      	//axiom:F, alpha = pi/2
 				//F: "FF+[+F-F-F]-[-F+F+F]" //axiom:F, alpha = pi/8
 				// F: "FF", X:"F[+X]F[-X]+X" //axiom:X, alpha = pi/9
-				F: "F+f-F"    	//axiom:F, alpha = pi/2
+				// F: "F+f-F"    	//axiom:F, alpha = pi/2
 				// F: "F[+F]-F"
 
 			};
@@ -56,16 +56,28 @@ window.onload = function init() {
 			gl.drawArrays(gl.LINES, 0, num_vertices); 
 };
 
-function turtle(initial_config, alpha, axiom, production_rules, num_productions) {	
-	
+function turtle(initial_config, alpha, axiom, production_rules, num_productions) {
+
 	// Initialize the points array, the newpoint, basepoint and statepoint objects.
 	var points = [];
 	var newpoint = {}
 	var basepoint = {};
 	var statepoint = {};
 
+	// Yes, let instructions be a string for now.
+	var instructions = "";
+
+	// Convert the axiom string into an array of characters.
+	axiom = axiom.split('');
+	axiom.forEach(function(char) {
+		if (char in production_rules) {
+			instructions = instructions.concat(production_rules[char])	
+		} else {
+			instructions = instructions.concat(char);
+		}
+	});
+
 	// Convert the production_rules string into an array of characters.
-	var instructions = production_rules.F;
 	instructions = instructions.split('');
 
 	// Copy the initial x, y coordinates and the theta into basepoint.
@@ -83,7 +95,7 @@ function turtle(initial_config, alpha, axiom, production_rules, num_productions)
 				// Update the basepoint coordinates.
 				basepoint.x = newpoint.x;
 				basepoint.y = newpoint.y;
-				
+
 				break;
 
 			// Move forward by distance 1 while drawing a line segment from the old position to the new position
