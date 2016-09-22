@@ -2,9 +2,9 @@
 
 var gl; // global variable
 var time;
-var xRotation = 180;
+var xRotation = 200;
 var yRotation = 180;
-var zRotation = 180;
+var zRotation = 200;
 var xRotationU, yRotationU, zRotationU;
 
 window.onload = function init() {
@@ -25,34 +25,33 @@ window.onload = function init() {
   var program = initShaders( gl, "vertex-shader", "fragment-shader" );
   gl.useProgram( program );
 
-
   // Bind HTML elements to rotation variables
   var xRotationHTML = document.getElementById('x-rotation');
-  xRotationHTML.onchange = function() {
+  xRotationHTML.oninput = function() {
     xRotation = parseInt(event.srcElement.value);
-    console.log(xRotation);
   };
 
   var yRotationHTML = document.getElementById('y-rotation');
-  yRotationHTML.onchange = function() {
+  yRotationHTML.oninput = function() {
     yRotation = parseInt(event.srcElement.value);
-    console.log(yRotation);
   };
 
   var zRotationHTML = document.getElementById('z-rotation');
   zRotationHTML.oninput = function() {
     zRotation = parseInt(event.srcElement.value);
-    console.log(zRotation);
   };
   
   // Load data into a buffer
   var s = 0.4;
 
+  // Cube vertices in counter-clockwise order.
+  // Front face starting with a = bottom left
   var a = vec3(-s,-s, s);
   var b = vec3( s,-s, s);
   var c = vec3( s, s, s);
   var d = vec3(-s, s, s);
 
+  // Back face starting with e = bottom left
   var e = vec3(-s,-s,-s);
   var f = vec3( s,-s,-s);
   var g = vec3( s, s,-s);
@@ -60,22 +59,23 @@ window.onload = function init() {
 
   var vertices = [];
   vertices = vertices.concat(
-                  square(a,b,c,d), //front
-                  square(e,f,g,h), //end
+    square(a,b,c,d),  //front
+    square(e,f,g,h),  //end
 
-                  square(d,c,g,h), //top
-                  square(a,b,f,e), //bottom
+    square(d,c,g,h),  //top
+    square(a,b,f,e),  //bottom
 
-                  square(a,d,h,e), //left
-                  square(b,c,g,f) //right                  
-                  );
+    square(a,d,h,e),  //left
+    square(b,c,g,f)   //right                  
+  );
 
-  var c1 = vec3(0.3, 0.5, 0.4);
-  var c2 = vec3(1.0, 0.9, 0.6);
-  var c3 = vec3(1.0, 0.7, 0.2);
-  var c4 = vec3(0.7, 0.3, 0.1);
-  var c5 = vec3(0.5, 0.1, 0.0);
-  var c6 = vec3(0.4, 0.6, 0.8);
+  // Colors for each face
+  var c1 = vec3(0.9, 0.9, 0.9);
+  var c2 = vec3(0.8, 0.8, 0.8);
+  var c3 = vec3(0.7, 0.7, 0.7);
+  var c4 = vec3(0.6, 0.6, 0.6);
+  var c5 = vec3(0.5, 0.5, 0.5);
+  var c6 = vec3(0.4, 0.4, 0.4);
 
   var colors = [];
 
@@ -119,19 +119,28 @@ window.onload = function init() {
 
 function render(now) {
   requestAnimationFrame(render);
+
+  // Leaving time here just in case slight automatic rotation is needed.
   gl.uniform1f(time,0.001*now);
-  console.log(xRotation, yRotation, zRotation);
-  gl.uniform1f(xRotationU, xRotation);
-  gl.uniform1f(yRotationU, yRotation);
-  gl.uniform1f(zRotationU, Math.PI * zRotation/180);
+
+  // Update corresponding uniform variables. 
+  gl.uniform1f(xRotationU, Math.PI * xRotation / 180);
+  gl.uniform1f(yRotationU, Math.PI * yRotation / 180);
+  gl.uniform1f(zRotationU, Math.PI * zRotation / 180);
+
+  // Uncomment the following line to get a slight automatic rotation around the Z-axis.
+  // gl.uniform1f(zRotationU, Math.PI * zRotation * now * 0.00005 / 180);
+
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.drawArrays(gl.TRIANGLES,0,36);
 }
 
+// Generate vertices for 2 triangles that form a square.
 function square(a, b, c, d) {
   return [a, b, c, c, d, a];
 }
 
+// Helper function.
 function repeatArray(arr, n) {
   var result = [];
   for (var i = 0; i < n; i++) {

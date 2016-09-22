@@ -14,6 +14,8 @@
       attribute vec4 vColor;
       varying vec4 fColor;
       uniform float time;
+      uniform float xRotationU;
+      uniform float yRotationU;
       uniform float zRotationU;
 
       void main(){
@@ -23,10 +25,25 @@
         float z = vPosition.z;
 
         gl_Position.x = x*cos(zRotationU) - z*sin(zRotationU);
-        gl_Position.z = x*sin(zRotationU) + z*cos(zRotationU);
-        
-        // gl_Position.z = zRotationU;
         gl_Position.y = y;
+        gl_Position.z = z*cos(zRotationU) + x*sin(zRotationU);
+
+        x = gl_Position.x;
+        y = gl_Position.y;
+        z = gl_Position.z;
+
+        gl_Position.y = y*cos(yRotationU) - x*sin(yRotationU);
+        gl_Position.z = z;
+        gl_Position.x = x*cos(yRotationU) + y*sin(yRotationU);
+
+        x = gl_Position.x;
+        y = gl_Position.y;
+        z = gl_Position.z;
+
+        gl_Position.z = z*cos(xRotationU) - y*sin(xRotationU);
+        gl_Position.x = x;
+        gl_Position.y = y*cos(xRotationU) + z*sin(xRotationU);
+
         gl_Position.w = 1.0;
 
       }
@@ -46,7 +63,7 @@
       HTML5 Canvas not supported!
     </canvas><br>
 
-    <input id="x-rotation" type="range" min="0" max="360" step="5">
+    <input id="x-rotation" type="range" min="0" max="360" step="5" value="200">
       X-rotation
     </input><br>
 
@@ -54,7 +71,7 @@
       Y-rotation
     </input><br>
 
-    <input id="z-rotation" type="range" min="0" max="360" step="5">
+    <input id="z-rotation" type="range" min="0" max="360" step="5" value="200">
       Z-rotation
     </input>
   </body>
