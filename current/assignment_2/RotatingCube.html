@@ -14,6 +14,7 @@
       attribute vec4 vColor;
       varying vec4 fColor;
       uniform float time;
+      uniform float zRotationU;
 
       void main(){
         fColor = vColor;
@@ -21,8 +22,10 @@
         float y = vPosition.y;
         float z = vPosition.z;
 
-        gl_Position.x = x*cos(time) - z*sin(time);
-        gl_Position.z = x*sin(time) + z*cos(time);
+        gl_Position.x = x*cos(zRotationU) - z*sin(zRotationU);
+        gl_Position.z = x*sin(zRotationU) + z*cos(zRotationU);
+        
+        // gl_Position.z = zRotationU;
         gl_Position.y = y;
         gl_Position.w = 1.0;
 
@@ -34,7 +37,6 @@
       varying vec4 fColor;
       void main(){
         gl_FragColor = fColor;
-        // gl_FragColor = vec4( 0.9, 0.6, 0.3, 1.0 );
       }
     </script>
   </head>
@@ -42,7 +44,19 @@
   <body>
     <canvas id="gl-canvas" width="512" height="512">
       HTML5 Canvas not supported!
-    </canvas>
+    </canvas><br>
+
+    <input id="x-rotation" type="range" min="0" max="360" step="5">
+      X-rotation
+    </input><br>
+
+    <input id="y-rotation" type="range" min="0" max="360" step="5">
+      Y-rotation
+    </input><br>
+
+    <input id="z-rotation" type="range" min="0" max="360" step="5">
+      Z-rotation
+    </input>
   </body>
 
 </html>

@@ -1,6 +1,11 @@
 "use strict";
+
 var gl; // global variable
-var time; 
+var time;
+var xRotation = 180;
+var yRotation = 180;
+var zRotation = 180;
+var xRotationU, yRotationU, zRotationU;
 
 window.onload = function init() {
   // Set up WebGL
@@ -15,11 +20,30 @@ window.onload = function init() {
   gl.enable(gl.DEPTH_TEST);
   gl.depthFunc(gl.LEQUAL);
   gl.clearDepth(1.0);
-      
-  
+       
   // Load shaders and initialize attribute buffers
   var program = initShaders( gl, "vertex-shader", "fragment-shader" );
   gl.useProgram( program );
+
+
+  // Bind HTML elements to rotation variables
+  var xRotationHTML = document.getElementById('x-rotation');
+  xRotationHTML.onchange = function() {
+    xRotation = parseInt(event.srcElement.value);
+    console.log(xRotation);
+  };
+
+  var yRotationHTML = document.getElementById('y-rotation');
+  yRotationHTML.onchange = function() {
+    yRotation = parseInt(event.srcElement.value);
+    console.log(yRotation);
+  };
+
+  var zRotationHTML = document.getElementById('z-rotation');
+  zRotationHTML.oninput = function() {
+    zRotation = parseInt(event.srcElement.value);
+    console.log(zRotation);
+  };
   
   // Load data into a buffer
   var s = 0.4;
@@ -83,6 +107,10 @@ window.onload = function init() {
   gl.bindBuffer(gl.ARRAY_BUFFER,cBuffer);
   gl.vertexAttribPointer(vColor, 3, gl.FLOAT, false, 0, 0);
 
+  // Set up uniform variables
+  xRotationU = gl.getUniformLocation(program, 'xRotationU');
+  yRotationU = gl.getUniformLocation(program, 'yRotationU');
+  zRotationU = gl.getUniformLocation(program, 'zRotationU');
   time = gl.getUniformLocation(program,"time");
 
   requestAnimationFrame(render);
@@ -92,6 +120,10 @@ window.onload = function init() {
 function render(now) {
   requestAnimationFrame(render);
   gl.uniform1f(time,0.001*now);
+  console.log(xRotation, yRotation, zRotation);
+  gl.uniform1f(xRotationU, xRotation);
+  gl.uniform1f(yRotationU, yRotation);
+  gl.uniform1f(zRotationU, Math.PI * zRotation/180);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.drawArrays(gl.TRIANGLES,0,36);
 }
