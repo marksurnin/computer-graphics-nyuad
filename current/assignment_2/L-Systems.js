@@ -16,27 +16,29 @@ window.onload = function init() {
 			gl.useProgram( program );
 			
 			var initial_config = {
-			  x: 0, y:0, theta: Math.PI/2	
+			  x: 0, y:0, theta: 0	
 			};
 
-			var alpha = Math.PI/8;
+			var alpha = Math.PI/3;
 
-			var axiom = "F";
+			var axiom = "XF";
 
 			var production_rules = {
-				F: "F[+F]F[-F]F"				  	//axiom:F, alpha = pi/8	
+				// F: "F[+F]F[-F]F"				  	//axiom:F, alpha = pi/8	
 				// F: "FF+F+F+FF+F+F-F"    		//axiom:F, alpha = pi/2
 				// F: "F+F-F-FF+F+F-F"      	//axiom:F, alpha = pi/2
-				// F: "FF+[+F-F-F]-[-F+F+F]" //axiom:F, alpha = pi/8
+				// F: "FF+[+F-F-F]-[-F+F+F]" 	//axiom:F, alpha = pi/8
 				// F: "FF", X:"F[+X]F[-X]+X"	//axiom:X, alpha = pi/9
 				// F: "F+f-F"									//axiom:F, alpha = pi/2
 				// F: "F[+F]-F"
+
+				// Sierpinski arrowhead curve: https://en.wikipedia.org/wiki/Sierpi%C5%84ski_arrowhead_curve
+				X: "YF+XF+Y", Y:"XF-YF-X"			//axiom:XF, alpha = pi/2
 			};
 
-			var num_productions = 5;
+			var num_productions = 6;
 
-			var v = turtle(initial_config, alpha, axiom, 
-			                      production_rules, num_productions);
+			var v = turtle(initial_config, alpha, axiom, production_rules, num_productions);
 
 			// Load data into a buffer
 			var vBuffer = gl.createBuffer();
@@ -56,20 +58,27 @@ window.onload = function init() {
 function turtle(initial_config, alpha, axiom, production_rules, num_productions) {
 
 	// Initialize the points array, the newpoint, basepoint and statepoint objects.
+	// Array that holds the final set of points to be drawn.
 	var points = [];
+
+	// Array that holds point objects used to save and retrieve states. 
 	var states = [];
+
+	// Temporary point objects used in the forEach loop.
 	var newpoint = {}
 	var basepoint = {};
 	var statepoint = {};
 
+	// Generate the full instruction string.
 	var instructions = generateInstructions(axiom, production_rules, num_productions);
 
-	// Copy the initial x, y coordinates and the theta into basepoint.
+	// Copy the initial x, y coordinates and the theta into basepoint object.
 	basepoint = clone(initial_config);
 
 	instructions.forEach(function(instruction, i) {
 		newpoint = {};
 		switch (instruction) {
+
 			// Move forward by distance 1 without drawing anything.
 			case 'f':
 				// Caclulate the coordinates of the new point.
