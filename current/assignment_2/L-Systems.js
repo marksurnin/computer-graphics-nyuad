@@ -24,14 +24,13 @@ window.onload = function init() {
 			var axiom = "F";
 
 			var production_rules = {
-				F: "F[+F[-F]+F]F[-F]F"		  	//axiom:F, alpha = pi/8	
+				F: "F[+F]F[-F]F"				  	//axiom:F, alpha = pi/8	
 				// F: "FF+F+F+FF+F+F-F"    		//axiom:F, alpha = pi/2
 				// F: "F+F-F-FF+F+F-F"      	//axiom:F, alpha = pi/2
-				//F: "FF+[+F-F-F]-[-F+F+F]" //axiom:F, alpha = pi/8
+				// F: "FF+[+F-F-F]-[-F+F+F]" //axiom:F, alpha = pi/8
 				// F: "FF", X:"F[+X]F[-X]+X"	//axiom:X, alpha = pi/9
 				// F: "F+f-F"									//axiom:F, alpha = pi/2
 				// F: "F[+F]-F"
-
 			};
 
 			var num_productions = 5;
@@ -63,21 +62,7 @@ function turtle(initial_config, alpha, axiom, production_rules, num_productions)
 	var basepoint = {};
 	var statepoint = {};
 
-	// Yes, let instructions be a string for now.
-	var instructions = "";
-
-	// Convert the axiom string into an array of characters.
-	axiom = axiom.split('');
-	axiom.forEach(function(char) {
-		if (char in production_rules) {
-			instructions = instructions.concat(production_rules[char])	
-		} else {
-			instructions = instructions.concat(char);
-		}
-	});
-
-	// Convert the production_rules string into an array of characters.
-	instructions = instructions.split('');
+	var instructions = generateInstructions(axiom, production_rules, num_productions);
 
 	// Copy the initial x, y coordinates and the theta into basepoint.
 	basepoint = clone(initial_config);
@@ -143,6 +128,35 @@ function turtle(initial_config, alpha, axiom, production_rules, num_productions)
 
 	points = normalize(points);
 	return points;
+}
+
+// Generates the full instuctions string.
+function generateInstructions(axiom, production_rules, num_productions) {
+	var instructions = axiom.split('');
+	//  Array for storing temporary instructions.
+	var output = [];
+
+	for (var i = 0; i < num_productions; i++) {
+
+		for (var j = 0; j < instructions.length; j++) {
+			// If an instruction has a rule in production_rules,
+			// append the expanded string to output.
+			if (instructions[j] in production_rules) {
+				output = output.concat(production_rules[instructions[j]].split(''));
+			}
+			// Else, just append the instruction as is to output.
+			 	else {
+				output = output.concat(instructions[j]);
+			}
+		}
+
+		// Transfer the new instruction set into the instructions array
+		// and empty the output array.
+		instructions = output;
+		output = [];
+	}
+
+	return instructions;
 }
 
 // Clone a JavaScript object.
