@@ -23,8 +23,10 @@ window.onload = function init() {
 
 	// Two triangles that form a square
 	var s = 0.2;
-	var rectangles = [];
+	var rectangles = new Float32Array(2**16);
 	var new_rectangles = [];
+	var offset = 0;
+	var index = 0;
 
 	// Mouse click on canvas
 	canvas.addEventListener("click", function(event) {
@@ -43,12 +45,23 @@ window.onload = function init() {
 
 			// Compute vertices for the rectangle.
 			new_rectangles = quad(v1, v2, v3, v4);
-			rectangles = rectangles.concat(new_rectangles);
 
-			// Draw all the vertices.
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rectangles), gl.STREAM_DRAW);
-			gl.clear(gl.COLOR_BUFFER_BIT);
+			// rectangles = rectangles.concat(new_rectangles);
+			console.log(new_rectangles);
+
+			for (var i = 0; i<new_rectangles.length; i++) {
+				rectangles[index] = new_rectangles[i];
+				index++;
+			}
+
+			var sub = rectangles.subarray(index - 12);
+			offset = 4*(index - 12);
+			
+			gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			gl.bufferSubData(gl.ARRAY_BUFFER, offset, sub);
 			gl.drawArrays(gl.TRIANGLES, 0, rectangles.length/2);
+			console.log(rectangles);
 
 			// Reset vertices
 			v1 = {};
@@ -60,15 +73,14 @@ window.onload = function init() {
 
 	var vBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rectangles), gl.STREAM_DRAW);
-	// gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(rectangles));
+	gl.bufferData(gl.ARRAY_BUFFER, rectangles, gl.DYNAMIC_DRAW);
 
 	// Do shader plumbing
 	var vPosition = gl.getAttribLocation(program, "vPosition");
 	gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
 	gl.enableVertexAttribArray(vPosition);
 
-	//Draw a triangle
+	//Draw rectangles
 	gl.drawArrays(gl.TRIANGLES, 0, rectangles.length/2);
 	
 };
