@@ -17,13 +17,43 @@
     </script>
 
     <script id="fragment-shader" type="x-shader/x-fragment">
-      precision highp float;
+      #define NUM_ITERATIONS 50
+      #define ZOOM_FACTOR 2.0
+      #define X_OFFSET 0.5
+
+      #ifdef GL_FRAGMENT_PRECISION_HIGH
+        precision highp float;
+      #else
+        precision mediump float;
+      #endif
+      precision mediump int;
 
       void main(){
-        float normalizedX = gl_FragCoord.x - 256.0;
-        float normalizedY = gl_FragCoord.y - 256.0;
+        vec2 z;
+        float x,y;
+        int iterations;
 
-        if (sqrt(normalizedX * normalizedX + normalizedY * normalizedY) < 80.0) {
+        float normalizedX = (gl_FragCoord.x - 256.0) / 512.0 * ZOOM_FACTOR - X_OFFSET;
+        float normalizedY = (gl_FragCoord.y - 256.0) / 512.0 * ZOOM_FACTOR;
+
+        z.x = normalizedX;
+        z.y = normalizedY;
+
+        for (int i = 0; i < NUM_ITERATIONS; i++) {
+          iterations = i;
+
+          x = (z.x * z.x - z.y * z.y) + normalizedX;
+          y = (z.y * z.x + z.x * z.y) + normalizedY;
+
+          if ((x*x + y*y) > 4.0) {
+            break;
+          }
+
+          z.x = x;
+          z.y = y;
+        }
+
+        if (iterations == NUM_ITERATIONS - 1) {
           gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);
         } else {
           gl_FragColor = vec4(0.2, 0.2, 0.2, 1.0);
