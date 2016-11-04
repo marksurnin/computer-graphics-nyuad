@@ -85,6 +85,9 @@ window.onload = function init() {
                          repeatArray(c4, 6),
                          repeatArray(c5, 6),
                          repeatArray(c6, 6));
+
+  console.log(square(a,b,c,d).length, repeatArray(vec3(0.9, 0.9, 0.9), 6).length);
+  console.log(vertices.length, colors.length);
   
   var vBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
@@ -92,7 +95,7 @@ window.onload = function init() {
 
   var cBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);      
+  gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
         
   // Do shader plumbing
   var vPosition = gl.getAttribLocation(program, "vPosition");
