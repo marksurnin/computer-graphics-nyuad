@@ -9,7 +9,7 @@ function objInit(Obj){
 		(Obj.triangles !== undefined) && (Obj.triangles.length > 0);
 
 	var normalsPresent = 
-	    (Obj.normals!==undefined) && (Obj.normals.length > 0);	
+	    (Obj.normals!==undefined) && (Obj.normals.length > 0);
 
 	if(!trianglesPresent){ 
 		/* Obj.triangles = [[0,1,2], [3,4,5], ...] */
@@ -65,7 +65,7 @@ function objInit(Obj){
 		gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, flatten(Obj.positions), gl.STATIC_DRAW);
 		
-		// setup normals buffer
+		//setup normals buffer
 		// nBuffer = gl.createBuffer();
 		// gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
 		// gl.bufferData(gl.ARRAY_BUFFER, flatten(Obj.normals), gl.STATIC_DRAW);
@@ -83,6 +83,23 @@ function objInit(Obj){
 		   The normal at a vertex is the weighted sum of the 
 		   normals of adjacent triangles. The weight of a 
 		   triangle is proportional to its area. */
+		var info = {};
+
+		for (var i = 0; i < Obj.triangles.length; i++) {
+			var triangle = Obj.triangles[i];
+			//console.log('triangle', triangle);
+
+			var A = Obj.positions[triangle[0]];
+			var B = Obj.positions[triangle[1]];
+			var C = Obj.positions[triangle[2]];
+
+			var area = Math.abs((A[0]*(B[1]-C[1]) + B[0]*(C[1]-A[1]) + C[0]*(A[1]-B[1]))/2);
+			info[i.toString()] = area;
+		}
+		info['0']['normal'] = 7;
+		console.log(info);
+
+
 		Obj.normals = [];
 		// Add your code here.
 	}

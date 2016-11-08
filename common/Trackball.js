@@ -1,7 +1,18 @@
 function Trackball(canvas){ 
 	
 	var trackball = { /* object to be returned */
-		getMatrix: function() { return tbMatrix; }
+
+		getMatrix: function() { return tbMatrix; },
+
+		getNormalTransformationMatrix: function() {
+			// since the trackball matrix just does rotation
+			// we return the linear part of tbMatrix.
+			m = tbMatrix;
+			return mat3( m[0][0], m[0][1], m[0][2],
+						 m[1][0], m[1][1], m[1][2],
+						 m[2][0], m[2][1], m[2][2] );
+		}
+		
 	}; 
 
 	var lastVector, tracking = false;

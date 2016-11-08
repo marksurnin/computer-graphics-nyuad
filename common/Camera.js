@@ -36,7 +36,7 @@ function Camera(canvas){
 
 			keyPressed: function(keyCode) {
 
-				console.log(prevKeyCode, keyCode);
+				//console.log(prevKeyCode, keyCode);
 
 				if (prevKeyCode === 17 && (keyCode === 38 || keyCode === 40)) {
 
@@ -46,7 +46,7 @@ function Camera(canvas){
 						translation = -distance;
 					}
 
-					console.log(translation);
+					//console.log(translation);
 
 					var rowX = vec4(1,0,0,0);
 					var rowY = vec4(0,1,0,translation);
@@ -57,7 +57,7 @@ function Camera(canvas){
 				}
 
 				else if (keyCode === 38 || keyCode === 40) {
-					console.log('up');
+					//console.log('up');
 
 					if (keyCode === 38) {
 						angle = -theta;
@@ -98,7 +98,7 @@ function Camera(canvas){
 					}
 
 					var angleR = angle * Math.PI/180;
-					console.log('up');
+					//console.log('up');
 					var rowX = vec4(Math.cos(angleR), 0, Math.sin(angleR), 0);
 					var rowY = vec4(0,1,0,0);
 					var rowZ = vec4(-Math.sin(angleR), 0, Math.cos(angleR), 0);

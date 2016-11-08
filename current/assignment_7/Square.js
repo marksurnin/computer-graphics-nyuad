@@ -10,6 +10,8 @@ var cubeModelMatrix, floorModelMatrix;
 var camera; // camera object
 var trackball; // virtual trackball 
 var numVertices, numIndices;
+var grid;
+var Locations;
 
 
 var uMVP; // location of Model-View-Projection matrix
@@ -32,15 +34,6 @@ window.onload = function init() {
 			program = initShaders( gl, "vertex-shader", "fragment-shader" );
 			gl.useProgram( program );
 
-			// Load data into a buffer
-			var vertices = [];
-			var colors = [];
-			var indices = [];
-
-			var R = vec3(1,0.6,0);
-			var G = vec3(0,1,0);
-			var B = vec3(0,0,1);
-
 			// floor 
 			var l = 1.0;
 
@@ -50,7 +43,8 @@ window.onload = function init() {
 			function Grid(n) {
 				var gridObj = {};
 				gridObj.positions = [];
-				gridObj.triangles = [];		
+				gridObj.triangles = [];	
+				gridObj.normals = [];	
 
 				function generateGridVertices(n) {
 					var prev = {};
@@ -64,11 +58,13 @@ window.onload = function init() {
 
 						// vertices.push(vec3(next.x, next.y, 0));
 						gridObj.positions.push(vec3(next.x, next.y, 0));
+						gridObj.normals.push(vec3(0, 1, 0));						
 
 						for (var col = 0; col < n; col++) {
 							next.x = prev.x + 2*l/n;
 							// vertices.push(vec3(next.x, next.y, 0));
 							gridObj.positions.push(vec3(next.x, next.y, 0));
+							gridObj.normals.push(vec3(0, 1, 0));
 							
 							prev.x = next.x;
 						}
@@ -99,8 +95,6 @@ window.onload = function init() {
 						triangles.splice(offset, 2);
 						gridObj.triangles.splice(offset, 2);
 					}
-
-					// indices = flatten(triangles);
 				}
 
 				generateGridVertices(n)
@@ -109,69 +103,47 @@ window.onload = function init() {
 				return gridObj;
 			}
 
-			var grid = Grid(n);
+			grid = Grid(n);
 			objInit(grid);
-			grid.draw();
-
-			numIndices = indices.length;
-
-			// the z function
-
-			function calcZ(x, y, t) {				
-				var gray = Math.random();
-				colors.push(vec3(gray, gray, gray));
-
-				if (x == 0 && y == 0) {
-					return 0;
-				} else {
-					var r = Math.sqrt(x**2 + y**2);
-					return(Math.sin(20*r)/(20*r));
-				}
-			}
-
-			for (var i = 0; i < vertices.length; i++) {
-				vertices[i][2] = calcZ(vertices[i][0], vertices[i][1], 1);
-			}
-
-			floorModelMatrix = translate(0,-0.3,0);
-
+			console.log(grid);
 
 			// get location of MVP
 			uMVP = gl.getUniformLocation(program,"MVP");
 
+			var Uniforms = ["VP", "TBNT", "TB", "cameraPosition", 
+			  "Ka", "Kd", "Ks", "shininess", 
+			  "Ia", "Id", "Is", "lightPosition", "shading"];
+			var Attributes = ["vPosition"];
+			Locations = getLocations(Attributes, Uniforms);
 
-			// vBuffer = gl.createBuffer();
-			// gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-			// gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
-			
+			// set light source
+			var Light = {
+				position: vec3(-30,50,100),
+				Ia: vec3(0.2, 0.2, 0.2),
+				Id: vec3(1,1,1),
+				Is: vec3(0.8,0.8,0.8)
+			};
 
-			// cBuffer = gl.createBuffer();
-			// gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-			// gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
+			gl.uniform3fv( Locations.lightPosition, flatten(Light.position) );
+			gl.uniform3fv( Locations.Ia, flatten(Light.Ia) );
+			gl.uniform3fv( Locations.Id, flatten(Light.Id) );
+			gl.uniform3fv( Locations.Is, flatten(Light.Is) );
 
+			// set material
+			var Material = {	
+				Ka: vec3(1.0, 1.0, 1.0),
+				Kd: vec3(0.1, 0.2, 0.8),
+				Ks: vec3(1.0, 1.0, 1.0),
+				shininess: 500 
+			};
 
-			// iBuffer = gl.createBuffer();
-			// gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuffer);
-			// gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint8Array(indices), gl.STATIC_DRAW);
-
-						
-			// Do shader plumbing
-			var vPosition = gl.getAttribLocation(program, "vPosition");
-			gl.enableVertexAttribArray(vPosition);
-
-			// var vColor = gl.getAttribLocation(program,"vColor");
-			// gl.enableVertexAttribArray(vColor);
-
-			// gl.bindBuffer(gl.ARRAY_BUFFER,vBuffer);
-			// gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
-			
-			// gl.bindBuffer(gl.ARRAY_BUFFER,cBuffer);
-			// gl.vertexAttribPointer(vColor, 3, gl.FLOAT, false, 0, 0);
-
+			gl.uniform3fv(Locations.Ka, flatten(Material.Ka));
+			gl.uniform3fv(Locations.Kd, flatten(Material.Kd));
+			gl.uniform3fv(Locations.Ks, flatten(Material.Ks));
+			gl.uniform1f(Locations.shininess, Material.shininess);
 
 			// set up virtual trackball
 			trackball = Trackball(canvas);
-
 
 			// set up Camera
 			camera = Camera(canvas); 
@@ -190,36 +162,23 @@ window.onload = function init() {
 };
 
 function render(now){
-	var MVP;
 
 	requestAnimationFrame(render);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+	var TB = trackball.getMatrix();
+	gl.uniformMatrix4fv(Locations.TB, gl.FALSE, flatten(TB));
 
-	//draw cube
-	var t = fmod(now/1000,2);
-	var h;
-	if(t < 1){
-		h = 1-t*t;
-	}
-	else{
-		h = 1 - (2-t)*(2-t);
-	}
+	var TBNT = trackball.getNormalTransformationMatrix();
+	gl.uniformMatrix3fv(Locations.TBNT, gl.FALSE, flatten(TBNT));	
 
-	var tbMatrix = trackball.getMatrix();
-	var cameraMatrix = camera.getMatrix();
-	var M =  mult(cameraMatrix, tbMatrix); // combining camera and trackball matrices
+	var VP = camera.getMatrix(); 
+	gl.uniformMatrix4fv(Locations.VP, gl.FALSE, flatten(VP));	
 
-	//MVP = mult( M, mult(translate(0,h,0), cubeModelMatrix) );
-	//gl.uniformMatrix4fv(uMVP, gl.FALSE, flatten(MVP));
-	
-	//gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_BYTE,0);
+	var cameraPosition = vec3(0,0,3);
+	gl.uniform3fv(Locations.cameraPosition, flatten(cameraPosition));
 
-	//draw floor
-	MVP = mult(M, floorModelMatrix);
-	gl.uniformMatrix4fv(uMVP, gl.FALSE, flatten(MVP));
-	gl.drawElements(gl.TRIANGLES, numIndices, gl.UNSIGNED_BYTE, 0);
-
+	grid.draw();
 }
 
 function fmod(a,b) { 
