@@ -44,7 +44,6 @@ window.onload = function init() {
 				var gridObj = {};
 				gridObj.positions = [];
 				gridObj.triangles = [];	
-				gridObj.normals = [];	
 
 				function generateGridVertices(n) {
 					var prev = {};
@@ -58,14 +57,10 @@ window.onload = function init() {
 
 						// vertices.push(vec3(next.x, next.y, 0));
 						gridObj.positions.push(vec3(next.x, next.y, 0));
-						gridObj.normals.push(vec3(0, 1, 0));						
-
 						for (var col = 0; col < n; col++) {
 							next.x = prev.x + 2*l/n;
 							// vertices.push(vec3(next.x, next.y, 0));
 							gridObj.positions.push(vec3(next.x, next.y, 0));
-							gridObj.normals.push(vec3(0, 1, 0));
-							
 							prev.x = next.x;
 						}
 						next.y = prev.y + 2*l/n;
