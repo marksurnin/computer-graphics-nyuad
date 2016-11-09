@@ -56,6 +56,7 @@ function render(now) {
 
 	// Current time in seconds
 	var t = now*0.0005;
+	console.log(t);
 
 	// ut - uniform variable
 	gl.uniform1f(ut, t);

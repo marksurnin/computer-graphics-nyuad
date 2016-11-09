@@ -37,7 +37,7 @@ window.onload = function init() {
 			// floor 
 			var l = 1.0;
 
-			var n = 10; // Cool stuff when n is 6, 10. 20 is super crazy, at your own risk, please :)
+			var n = 100; // Cool stuff when n is 6, 10. 20 is super crazy, at your own risk, please :)
 			
 
 			function Grid(n) {
@@ -112,7 +112,7 @@ window.onload = function init() {
 
 			var Uniforms = ["VP", "TBNT", "TB", "cameraPosition", 
 			  "Ka", "Kd", "Ks", "shininess", 
-			  "Ia", "Id", "Is", "lightPosition", "shading"];
+			  "Ia", "Id", "Is", "lightPosition", "shading", "t"];
 			var Attributes = ["vPosition"];
 			Locations = getLocations(Attributes, Uniforms);
 
@@ -177,6 +177,10 @@ function render(now){
 
 	var cameraPosition = vec3(0,0,3);
 	gl.uniform3fv(Locations.cameraPosition, flatten(cameraPosition));
+
+	var t = now * 0.0008;
+	t = t.toFixed(2);
+	gl.uniform1f(Locations.t, t);
 
 	grid.draw();
 }

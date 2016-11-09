@@ -21,43 +21,43 @@ uniform mat4 VP, TB;
 uniform mat3 TBNT;
 varying vec3 fNormal;
 
-float calcZ(float x, float y) {
-  if (x == 0.0 && y == 0.0) {
-    return 1.0;
-  } else {
-    float r;
-    r = sqrt(pow(x, 2.0) + pow(y, 2.0));
-    return(sin(20.0 * r)/(20.0 * r));
-  }
+float calcZ(float x, float y, float t) {
+  // Code for the bell-shaped object
+  // if (x == 0.0 && y == 0.0) {
+  //   return 1.0;
+  // } else {
+  //   float r;
+  //   r = sqrt(pow(x, 2.0) + pow(y, 2.0));
+  //   return(sin(3.14 * r)/(3.14 * r));
+  // }
+  return(sin(x+y+t));
 }
 
-vec3 computeNormal(float x, float y) {
+vec3 computeNormal(float x, float y, float t) {
   float delta = 0.001;
   float n1, n2;
-  n1 = (calcZ(x+delta, y) - calcZ(x, y))/delta;
-  n2 = (calcZ(x, y+delta) - calcZ(x, y))/delta;
-  return normalize(vec3(-n1,-n2, 1));
+  n1 = (calcZ(x+delta, y, t) - calcZ(x, y, t))/delta;
+  n2 = (calcZ(x, y+delta, t) - calcZ(x, y, t))/delta;
+  return normalize(vec3(-n1,-n2, 1.0));
 }
 
 void main(){
        vec4 v = vPosition;
        
-       //@TODO: Modify v.z
-       v.z = v.x*v.x + v.y*v.y;
+       //Modify v.z
+       v.z = calcZ(v.x, v.y, t);
 
-       v = TB*v;
-       float delta = 0.01;
+       v = TB * v;
 
-       //@TODO: Compute normal
-       vec3 normal = vec3(0.0, 0.0, 1.0);
+       //Compute normal
+       vec3 normal = computeNormal(v.x, v.y, t);
        
        fNormal = TBNT*normal;
 
        fPosition = v.xyz;
 
        v = VP * v;
-       // v.z = -t;
-       // v.z = -v.z; // compensate for left handed coordinate system used by WebGL
+       v.z = -v.z; // compensate for left handed coordinate system used by WebGL
        gl_Position = v;
 }
 </script>
@@ -86,7 +86,6 @@ vec4 computeColor(vec3 position, vec3 normal) {
 }
 
 void main(){
-    // gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
     gl_FragColor = computeColor(fPosition, normalize(fNormal));
 }
 </script>
