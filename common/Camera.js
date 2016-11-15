@@ -1,16 +1,25 @@
-function Camera(canvas){
+function Camera(){
 
 	var Mcam = mat4(); // camera matrix 
 	var P = mat4();    // projection matrix
-	var theta = 5;
-	var distance = 0.2;
-
-	var prevKeyCode = 0;
 	
+	var camFrame = { // camera frame
+			e: vec3(0,0,0), // camera location
+			u: vec3(1,0,0), // unit vector to "right"
+			v: vec3(0,1,0), // unit vector in "up" direction
+			w: vec3(0,0,1)  // unit vector opposite "gaze" direction
+	};			
+	
+	addEventHandlers();
+
 	var Cam = { /* object to be returned */
 		 	
 		 	lookAt: function (eye, at, up) {
-		 		Mcam = cameraMatrix(eye, at, up); 
+				var w = normalize(subtract(eye,at));
+				var u = cross(up, w);
+				var v = cross(w,u);
+				camFrame = {e: eye, u: u, v: v, w: w};
+				Mcam = cameraMatrix(eye, u, v, w); 
 		 	},
 
 		 	setPerspective: function(fovy, aspect, near, far){
@@ -22,7 +31,7 @@ function Camera(canvas){
 			},
 			
 			getCameraTransformationMatrix(){
-				return MCam;
+				return Mcam;
 			},
 			
 			getProjectionMatrix(){
@@ -33,115 +42,21 @@ function Camera(canvas){
 				// combines camera transformation and projection
 				return mult(P,Mcam);
 			},
-
-			keyPressed: function(keyCode) {
-
-				//console.log(prevKeyCode, keyCode);
-
-				if (prevKeyCode === 17 && (keyCode === 38 || keyCode === 40)) {
-
-					if (keyCode === 38) {
-						translation = distance;
-					} else if (keyCode === 40) {
-						translation = -distance;
-					}
-
-					//console.log(translation);
-
-					var rowX = vec4(1,0,0,0);
-					var rowY = vec4(0,1,0,translation);
-					var rowZ = vec4(0,0,1,0);
-					var rowW = vec4(0,0,0,1);
-					translationMatrix = mat4(rowX, rowY, rowZ, rowW);
-					Mcam = mult(translationMatrix, Mcam);
-				}
-
-				else if (keyCode === 38 || keyCode === 40) {
-					//console.log('up');
-
-					if (keyCode === 38) {
-						angle = -theta;
-					} else if (keyCode === 40) {
-						angle = theta;
-					}
-
-					var angleR = angle * Math.PI/180;
-					var rowX = vec4(1,0,0,0);
-					var rowY = vec4(0, Math.cos(angleR), -Math.sin(angleR), 0);
-					var rowZ = vec4(0, Math.sin(angleR), Math.cos(angleR), 0);
-					var rowW = vec4(0,0,0,1);
-					rotationMatrix = mat4(rowX, rowY, rowZ, rowW);
-					Mcam = mult(rotationMatrix, Mcam);
-				}
-
-				if (prevKeyCode === 17 && (keyCode === 37 || keyCode === 39)) {
-
-					if (keyCode === 37) {
-						translation = -distance;
-					} else if (keyCode === 39) {
-						translation = distance;
-					}
-
-					var rowX = vec4(1,0,0,translation);
-					var rowY = vec4(0,1,0,0);
-					var rowZ = vec4(0,0,1,0);
-					var rowW = vec4(0,0,0,1);
-					translationMatrix = mat4(rowX, rowY, rowZ, rowW);
-					Mcam = mult(translationMatrix, Mcam);
-				}
-
-				else if (keyCode === 37 || keyCode === 39) {
-					if (keyCode === 37) {
-						angle = -theta;
-					} else if (keyCode === 39) {
-						angle = theta;
-					}
-
-					var angleR = angle * Math.PI/180;
-					//console.log('up');
-					var rowX = vec4(Math.cos(angleR), 0, Math.sin(angleR), 0);
-					var rowY = vec4(0,1,0,0);
-					var rowZ = vec4(-Math.sin(angleR), 0, Math.cos(angleR), 0);
-					var rowW = vec4(0,0,0,1);
-					rotationMatrix = mat4(rowX, rowY, rowZ, rowW);
-					Mcam = mult(rotationMatrix, Mcam);
-				}
-
-
-				//az
-
-				if (keyCode === 65 || keyCode === 90) {
-					if (keyCode === 65) {
-						translation = -distance;
-					} else if (keyCode === 90) {
-						translation = distance;
-					}
-
-					var rowX = vec4(1,0,0,0);
-					var rowY = vec4(0,1,0,0);
-					var rowZ = vec4(0,0,1,translation);
-					var rowW = vec4(0,0,0,1);
-					rotationMatrix = mat4(rowX, rowY, rowZ, rowW);
-					Mcam = mult(rotationMatrix, Mcam);
-				}
-
-				prevKeyCode = keyCode;
-
-				return 0;
+			
+			getFrame: function (){
+				// returns camera frame (e, u, v, w)
+				return camFrame;
 			}
 
 	};
 
-	function cameraMatrix(eye, at, up){
-	  var w = normalize(subtract(eye,at));
-	  var u = cross(up, w);
-	  var v = cross(w,u);
-	  return mat4( vec4(u, -dot(u,eye)),
+	function cameraMatrix(eye,u,v,w){
+	    return mat4( vec4(u, -dot(u,eye)),
 				vec4(v, -dot(v,eye)),
 				vec4(w, -dot(w,eye)),
-				vec4(0,0,0,1)
-			);
+				vec4(0,0,0,1) );
 	}
+	
 
 	function orthoProjMatrix(r,l,t,b,n,f){ // n and f should be -ve
 
@@ -164,6 +79,51 @@ function Camera(canvas){
 		var t = near*Math.tan(radians(fovy/2));
 		var r = t*aspect;
 		return perspProjectionMatrix(r,-r, t,-t, -near, -far);
+	}
+	
+	function addEventHandlers(){
+		var delta = 0.1;
+		var theta = 0.1;
+				
+		window.onkeydown = function (e){	
+			var u, v, w;
+			var k = e.key;
+			var c = Math.cos(theta); 
+			var s = Math.sin(theta);
+			var f = camFrame;
+			var d = delta;
+			
+			if(k =="ArrowRight" || k == "ArrowDown"){s *= -1;}
+			if(k == "ArrowLeft" || k== "ArrowDown" || k == "a"){d*=-1};
+
+			
+			if(k == "ArrowUp" || k == "ArrowDown"){
+				if(e.ctrlKey == true){
+					f.e = add(f.e, scale(d,f.v));
+				}
+				else{
+					v = add(scale(c,f.v), scale(s,f.w));
+					w =  add(scale(-s,f.v), scale(c,f.w));
+					f.v = v; f.w = w;
+				}
+				Mcam = cameraMatrix(f.e, f.u, f.v, f.w);
+			}
+			else if(k == "ArrowLeft" || k == "ArrowRight"){
+				if(e.ctrlKey == true){
+					f.e = add(f.e, scale(d,f.u));
+				}
+				else{
+					w = add(scale(c,f.w), scale(s,f.u));
+					u = add(scale(-s,f.w), scale(c,f.u));
+					f.w = w; f.u = u;
+				}
+				Mcam = cameraMatrix(f.e, f.u, f.v, f.w);
+			}
+			else if(k == "a" || k == "z"){
+				f.e = add(f.e, scale(d,f.w));
+				Mcam = cameraMatrix(f.e, f.u, f.v, f.w);
+			}			
+		}	
 	}
 
 	return Cam;

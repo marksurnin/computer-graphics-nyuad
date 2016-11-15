@@ -37,7 +37,7 @@ window.onload = function init() {
 			// floor 
 			var l = 1.0;
 
-			var n = 100; // Cool stuff when n is 6, 10. 20 is super crazy, at your own risk, please :)
+			var n = 40; // Cool stuff when n is 6, 10. 20 is super crazy, at your own risk, please :)
 			
 
 			function Grid(n) {
@@ -100,7 +100,6 @@ window.onload = function init() {
 
 			grid = Grid(n);
 			objInit(grid);
-			console.log(grid);
 
 			// get location of MVP
 			uMVP = gl.getUniformLocation(program,"MVP");
