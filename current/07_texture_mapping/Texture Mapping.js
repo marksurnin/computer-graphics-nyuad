@@ -47,7 +47,7 @@ window.onload = function init(){
 
 	image = new Image();
 	image.onload = function(){handler(texture);};
-	image.src = "brick.gif";
+	image.src = "floor.gif";
 	
 	function handler(texture){		
 		gl.activeTexture(gl.TEXTURE0); 			 // enable texture unit 0

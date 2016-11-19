@@ -85,7 +85,7 @@ function Camera(){
 		var delta = 0.1;
 		var theta = 0.1;
 				
-		window.onkeydown = function (e){	
+		window.onkeydown = function (e){
 			var u, v, w;
 			var k = e.key;
 			var c = Math.cos(theta); 
