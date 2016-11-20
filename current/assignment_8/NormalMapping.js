@@ -63,7 +63,7 @@ window.onload = function init() {
 	// set up scene	
 
 	obj1 = Cube();
-	obj1.diffuseMap = "cube.jpg";
+	obj1.diffuseMap = "cubemap.jpg";
 	// obj1.normalMap = "Textures/earth-normal.jpg";
 	objInit(obj1);
 	obj1.setModelMatrix(rotateX(90));
@@ -243,11 +243,11 @@ function Cube(){
 
 	var S = {	positions: [a,a,a,b,b,b,c,c,c,d,d,d,e,e,e,f,f,f,g,g,g,h,h,h],
 		 	  	
-		 	  	texCoords: [  vec2(0.25, 0.00),  vec2(0.00, 0.33),  vec2(0.50, 0.00),  vec2(0.50, 0.00), // bottom
-		 	  								vec2(0.75, 0.33),  vec2(0.50, 1.00),  vec2(0.50, 0.33),  vec2(0.50, 0.33), // top
+		 	  	texCoords: [  vec2(0.25, 0.00),  vec2(0.00, 0.33),  vec2(1.00, 0.33),  vec2(0.50, 0.00), // bottom
+		 	  								vec2(0.75, 0.33),  vec2(0.75, 0.33),  vec2(0.50, 0.33),  vec2(0.50, 0.33), // top
 		 	  								vec2(0.50, 0.33),  vec2(0.25, 0.33),  vec2(0.25, 0.33),  vec2(0.25, 0.33), // left
-		 	  								vec2(0.25, 1.00),  vec2(0.00, 0.66),  vec2(0.75, 0.66),  vec2(0.50, 1.00), // right
-		 	  								vec2(0.75, 0.66),  vec2(0.50, 0.33),  vec2(0.50, 0.66),  vec2(0.50, 0.66), // back
+		 	  								vec2(0.25, 1.00),  vec2(0.00, 0.66),  vec2(1.00, 0.66),  vec2(0.50, 1.00), // right
+		 	  								vec2(0.75, 0.66),  vec2(0.75, 0.66),  vec2(0.50, 0.66),  vec2(0.50, 0.66), // back
 		 	  								vec2(0.50, 0.66),  vec2(0.25, 0.66),  vec2(0.25, 0.66),  vec2(0.25, 0.66) //front
 		 	  								
 		 	  								], 
