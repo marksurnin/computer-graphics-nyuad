@@ -1,7 +1,7 @@
 "use strict";
 
 // global variables
-var gl, canvas, program;
+var gl, canvas, program, grid;
 
 var camera; 	// camera object
 var trackball; 	// virtual trackball 
@@ -39,9 +39,9 @@ window.onload = function init() {
 
 	// set up Camera
 	camera = Camera(); // Camera(...) is defined in Camera.js
-	var eye = vec3(0,0.4,0);
-	var at = vec3(0, 0 ,0);
-	var up = vec3(0,0,-1);
+	var eye = vec3(0,0.1,0);
+	var at = vec3(0,0,-100);
+	var up = vec3(0,1,0);
 	camera.lookAt(eye,at,up);
 	camera.setPerspective(90,1,0.1,10);
 
@@ -69,13 +69,84 @@ window.onload = function init() {
 	obj1.setModelMatrix(rotateX(90));
 
 
-	obj2 = Square();
-	obj2.diffuseMap = "Textures/brick-diffuse.jpg";
-	obj2.normalMap = "Textures/brick-normal.jpg";
-	objInit(obj2);
+	// obj2 = Square();
+	// obj2.diffuseMap = "Textures/brick-diffuse.jpg";
+	// obj2.normalMap = "Textures/brick-normal.jpg";
+	// objInit(obj2);
+	// var m = mult(scalem(2,2,2),rotateX(90));
+	// m = mult(translate(0,-1.5,0), m);
+	// obj2.setModelMatrix(m);
+
+
+	// Grid code from previous assignment
+	var l = 1.0;
+	var n = 40; // Cool stuff when n is 6, 10. 20 is super crazy, at your own risk, please :)
+
+	function Grid(n) {
+		var gridObj = {};
+		gridObj.positions = [];
+		gridObj.triangles = [];	
+
+		function generateGridVertices(n) {
+			var prev = {};
+			var next = {};
+			prev.y = -l;
+			next.y = -l;
+
+			for (var row = 0; row <= n; row++) {
+				next.x = -l;
+				prev.x = -l;
+
+				// vertices.push(vec3(next.x, next.y, 0));
+				gridObj.positions.push(vec3(next.x, next.y, 0));
+				for (var col = 0; col < n; col++) {
+					next.x = prev.x + 2*l/n;
+					// vertices.push(vec3(next.x, next.y, 0));
+					gridObj.positions.push(vec3(next.x, next.y, 0));
+					prev.x = next.x;
+				}
+				next.y = prev.y + 2*l/n;
+				prev.y = next.y;
+			}
+		}
+
+		function triangulate(n) {
+			var output = [];
+			// Generate unique indices
+			for (var i = 0; i < n*(n+1); i++) {
+				output.push(i, i+n+1);
+			}
+
+			var triangles = [];
+			for (var i = 0; i < output.length - 2; i++) {
+				triangles.push([output[i], output[i+1], output[i+2]]);
+				gridObj.triangles.push([output[i], output[i+1], output[i+2]]);
+			}
+
+			var numTrianglesPerRow = Math.floor(triangles.length/n) - 1;
+			var offset = 0;
+
+			// Splice stuff
+			for (var i = 1; i < n; i++) {
+				offset = offset + numTrianglesPerRow;
+				triangles.splice(offset, 2);
+				gridObj.triangles.splice(offset, 2);
+			}
+		}
+
+		generateGridVertices(n)
+		triangulate(n);
+
+		return gridObj;
+	}
+
+	grid = Grid(n);
+	objInit(grid);
+	console.log(grid);
+
 	var m = mult(scalem(2,2,2),rotateX(90));
-	m = mult(translate(0,-1.5,0), m);
-	obj2.setModelMatrix(m);
+	grid.setModelMatrix(m);
+
 
 	requestAnimationFrame(render);
 
@@ -106,7 +177,8 @@ function render(now){
 	TBN = mat3();
 	gl.uniformMatrix3fv(Locations.TBN, gl.FALSE, flatten(TBN));
 
-	obj2.draw();
+	// obj2.draw();
+	grid.draw();
 }
 
 //-------------------------- CREATE SPHERE ----------------------------------- 
@@ -243,26 +315,26 @@ function Cube(){
 
 	var S = {	positions: [a,a,a,b,b,b,c,c,c,d,d,d,e,e,e,f,f,f,g,g,g,h,h,h],
 		 	  	
-		 	  	texCoords: [  vec2(0.25, 0.00),  vec2(0.00, 0.33),  vec2(1.00, 0.33),  vec2(0.50, 0.00), // bottom
-		 	  								vec2(0.75, 0.33),  vec2(0.75, 0.33),  vec2(0.50, 0.33),  vec2(0.50, 0.33), // top
-		 	  								vec2(0.50, 0.33),  vec2(0.25, 0.33),  vec2(0.25, 0.33),  vec2(0.25, 0.33), // left
-		 	  								vec2(0.25, 1.00),  vec2(0.00, 0.66),  vec2(1.00, 0.66),  vec2(0.50, 1.00), // right
-		 	  								vec2(0.75, 0.66),  vec2(0.75, 0.66),  vec2(0.50, 0.66),  vec2(0.50, 0.66), // back
-		 	  								vec2(0.50, 0.66),  vec2(0.25, 0.66),  vec2(0.25, 0.66),  vec2(0.25, 0.66) //front
-		 	  								
-		 	  								], 
-		 	  	triangles: [ [0,3,6],  [0,6,9], // bottom
-		 	  							 [18,15,12],  [12,21,18], // top
-		                   [13,1,10],  [13,10,22], // left
-		                   [4,16,19],  [4,19,7], // right
-		                   [11,8,20],  [11,20,23], // back
-		                   [14,17,5],  [14,5,2]],// front
-		 	  							 // [0,1,2],  [0,2,3], // bottom
-		 	  							 // [6,5,4],  [4,7,6], // top
-		            //        [4,0,3],  [4,3,7], // left
-		            //        [1,5,6],  [1,6,2], // right
-		            //        [3,2,6],  [3,6,7], // back
-		            //        [4,5,1],  [4,1,0] // front
+		 	  	texCoords: [  vec2(0.25, 0.00),  vec2(0.00, 0.33),  vec2(1.00, 0.33),  vec2(0.50, 0.00),
+		 	  								vec2(0.75, 0.33),  vec2(0.75, 0.33),  vec2(0.50, 0.33),  vec2(0.50, 0.33),
+		 	  								vec2(0.50, 0.33),  vec2(0.25, 0.33),  vec2(0.25, 0.33),  vec2(0.25, 0.33),
+		 	  								vec2(0.25, 1.00),  vec2(0.00, 0.66),  vec2(1.00, 0.66),  vec2(0.50, 1.00),
+		 	  								vec2(0.75, 0.66),  vec2(0.75, 0.66),  vec2(0.50, 0.66),  vec2(0.50, 0.66),
+		 	  								vec2(0.50, 0.66),  vec2(0.25, 0.66),  vec2(0.25, 0.66),  vec2(0.25, 0.66)], 
+		 	  	triangles: [ [ 0, 3, 6], [ 0, 6, 9],	// bottom
+		 	  							 [18,15,12], [12,21,18],	// top
+		                   [13, 1,10], [13,10,22],	// left
+		                   [ 4,16,19], [ 4,19, 7],	// right
+		                   [11, 8,20], [11,20,23], 	// back
+		                   [14,17, 5], [14, 5, 2]],	// front
+
+		                   // Old vertices
+		 	  							 // [0,1,2], [0,2,3], // bottom
+		 	  							 // [6,5,4], [4,7,6], // top
+		            			 // [4,0,3], [4,3,7], // left
+		            			 // [1,5,6], [1,6,2], // right
+		            			 // [3,2,6], [3,6,7], // back
+		            			 // [4,5,1], [4,1,0]	// front
 		 	  	material: {	
 							Ka: vec3(0.2, 0.2, 0.2),
 							Kd: vec3(0.0, 1.0, 0.5),
