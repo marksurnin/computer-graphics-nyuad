@@ -39,9 +39,9 @@ window.onload = function init() {
 
 	// set up Camera
 	camera = Camera(); // Camera(...) is defined in Camera.js
-	var eye = vec3(0,0,-0.4);
+	var eye = vec3(0,0.4,0);
 	var at = vec3(0, 0 ,0);
-	var up = vec3(0,1,0);
+	var up = vec3(0,0,-1);
 	camera.lookAt(eye,at,up);
 	camera.setPerspective(90,1,0.1,10);
 
@@ -241,26 +241,28 @@ function Cube(){
 	var tc = vec2(1,1);
 	var td = vec2(0,1);
 
-	var S = {	positions: [a,b,c,d,e,f,g,h],
+	var S = {	positions: [a,a,a,b,b,b,c,c,c,d,d,d,e,e,e,f,f,f,g,g,g,h,h,h],
 		 	  	
-		 	  	texCoords: [	vec2(0.50, 0.33),  vec2(0.25, 0.33),  vec2(0.25, 0.00),  vec2(0.50, 0.00), // front
-		 	  								vec2(0.00, 0.00),  vec2(0.00, 0.00),  vec2(0.00, 0.00),  vec2(0.00, 0.00), // left
-		 	  								vec2(0.00, 0.00),  vec2(0.00, 0.00),  vec2(0.00, 0.00),  vec2(0.00, 0.00), // right
-		 	  								vec2(0.00, 0.00),  vec2(0.00, 0.00),  vec2(0.00, 0.00),  vec2(0.00, 0.00), // back
-		                    vec2(0.25, 0.33),  vec2(0.50, 0.33),  vec2(0.50, 0.66),  vec2(0.25, 0.66), // top
-		                    vec2(0.00, 0.00),  vec2(0.00, 0.00),  vec2(0.00, 0.00),  vec2(0.00, 0.00)], // bottom
-		 	  	triangles: [ [0,1,2],  [0,2,3], // front (bottom)
-		 	  							 [6,5,4],  [4,7,6], // left (top)
-		                   [4,0,3],  [4,3,7], // right
-		                   [1,5,6],  [1,6,2], // back (left)
-		                   [3,2,6],  [3,6,7], // top (front)
-		                   [4,5,1],  [4,1,0]], // bottom (back)
-		 	  							 // [4,5,6],  [4,6,7], // front
-		 	  							 // [0,4,7],  [0,7,3], // left
-		            //        [5,1,2],  [5,2,6], // right
-		            //        [0,1,2],  [0,2,3], // back
-		            //        [7,6,2],  [7,2,3], // top
-		            //        [0,1,5],  [0,5,4]], // bottom
+		 	  	texCoords: [  vec2(0.25, 0.00),  vec2(0.00, 0.33),  vec2(0.50, 0.00),  vec2(0.50, 0.00), // bottom
+		 	  								vec2(0.75, 0.00),  vec2(0.50, 1.00),  vec2(0.50, 0.33),  vec2(0.25, 0.66), // top
+		 	  								vec2(0.00, 0.33),  vec2(0.25, 0.33),  vec2(0.25, 0.33),  vec2(0.00, 0.66), // left
+		 	  								vec2(0.25, 0.66),  vec2(0.00, 0.66),  vec2(0.75, 0.66),  vec2(0.50, 1.00), // right
+		 	  								vec2(0.25, 0.33),  vec2(0.50, 0.33),  vec2(0.50, 0.66),  vec2(0.25, 0.66), // back
+		 	  								vec2(0.00, 0.66),  vec2(0.25, 0.66),  vec2(0.25, 0.66),  vec2(0.00, 0.33) //front
+		 	  								
+		 	  								], 
+		 	  	triangles: [ [0,3,6],  [0,6,9], // bottom
+		 	  							 [18,15,12],  [12,21,18], // top
+		                   [13,1,10],  [13,10,22], // left
+		                   [4,16,19],  [4,19,7], // right
+		                   [11,8,20],  [11,20,23], // back
+		                   [14,17,5],  [14,5,2]],// front
+		 	  							 // [0,1,2],  [0,2,3], // bottom
+		 	  							 // [6,5,4],  [4,7,6], // top
+		            //        [4,0,3],  [4,3,7], // left
+		            //        [1,5,6],  [1,6,2], // right
+		            //        [3,2,6],  [3,6,7], // back
+		            //        [4,5,1],  [4,1,0] // front
 		 	  	material: {	
 							Ka: vec3(0.2, 0.2, 0.2),
 							Kd: vec3(0.0, 1.0, 0.5),
