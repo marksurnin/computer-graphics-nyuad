@@ -30,7 +30,7 @@ window.onload = function init() {
 
 	// Get Locations of attributes and Locations
 	var Attributes = [];
-	var Uniforms = ["VP", "TB", "TBN", "cameraPosition", "Ia", "Id", "Is", "lightPosition", "cube"];
+	var Uniforms = ["VP", "TB", "TBN", "cameraPosition", "cameraProjection", "Ia", "Id", "Is", "lightPosition", "cube"];
 
 	Locations = getLocations(Attributes, Uniforms); // defined in Utils.js
  
@@ -39,7 +39,7 @@ window.onload = function init() {
 
 	// set up Camera
 	camera = Camera(); // Camera(...) is defined in Camera.js
-	var eye = vec3(0,0.1,0);
+	var eye = vec3(0,0,0);
 	var at = vec3(0,0,-100);
 	var up = vec3(0,1,0);
 	camera.lookAt(eye,at,up);
@@ -165,6 +165,9 @@ function render(now){
 	
 	var VP = camera.getMatrix(); 
 	gl.uniformMatrix4fv(Locations.VP, gl.FALSE, flatten(VP));	
+
+	var cameraProjection = camera.getProjectionMatrix();
+	gl.uniformMatrix4fv(Locations.cameraProjection, gl.FALSE, flatten(cameraProjection));
 
 	var cameraPosition = camera.getFrame().e;
 	gl.uniform3fv(Locations.cameraPosition, flatten(cameraPosition));
@@ -294,14 +297,15 @@ function Square(){
 
 function Cube(){
 // create sphere with texture coordinates
-	var a = vec3(-1,-1,-1);
-	var b = vec3( 1,-1,-1);
-	var c = vec3( 1, 1,-1);
-	var d = vec3(-1, 1,-1);
-	var e = vec3(-1,-1, 1);
-	var f = vec3( 1,-1, 1);
-	var g = vec3( 1, 1, 1);
-	var h = vec3(-1, 1, 1);
+	var l = 1;
+	var a = vec3(-l,-l,-l);
+	var b = vec3( l,-l,-l);
+	var c = vec3( l, l,-l);
+	var d = vec3(-l, l,-l);
+	var e = vec3(-l,-l, l);
+	var f = vec3( l,-l, l);
+	var g = vec3( l, l, l);
+	var h = vec3(-l, l, l);
 
 	var n_top = vec3(0,-1,0);
 	var n_bottom = vec3(0,1,0);
