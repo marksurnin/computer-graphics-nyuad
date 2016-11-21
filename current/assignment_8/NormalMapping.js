@@ -1,7 +1,7 @@
 "use strict";
 
 // global variables
-var gl, canvas, program, grid, cube;
+var gl, canvas, program, grid, cube, terrain;
 
 var camera; 	// camera object
 var trackball; 	// virtual trackball 
@@ -30,7 +30,7 @@ window.onload = function init() {
 
 	// Get Locations of attributes and Locations
 	var Attributes = [];
-	var Uniforms = ["VP", "TB", "TBN", "cameraPosition", "cameraProjection", "Ia", "Id", "Is", "lightPosition", "cube"];
+	var Uniforms = ["VP", "TB", "TBN", "cameraPosition", "cameraProjection", "Ia", "Id", "Is", "lightPosition", "cube", "terrain"];
 
 	Locations = getLocations(Attributes, Uniforms); // defined in Utils.js
  
@@ -80,7 +80,7 @@ window.onload = function init() {
 
 	// Grid code from previous assignment
 	var l = 1.0;
-	var n = 40; // Cool stuff when n is 6, 10. 20 is super crazy, at your own risk, please :)
+	var n = 2; // Cool stuff when n is 6, 10. 20 is super crazy, at your own risk, please :)
 
 	function Grid(n) {
 		var gridObj = {};
@@ -116,14 +116,16 @@ window.onload = function init() {
 			for (var i = 0; i < n*(n+1); i++) {
 				output.push(i, i+n+1);
 			}
+			console.log(output);
 
 			var triangles = [];
 			for (var i = 0; i < output.length - 2; i++) {
 				triangles.push([output[i], output[i+1], output[i+2]]);
 				gridObj.triangles.push([output[i], output[i+1], output[i+2]]);
 			}
-
 			var numTrianglesPerRow = Math.floor(triangles.length/n) - 1;
+			console.log(triangles);
+
 			var offset = 0;
 
 			// Splice stuff
@@ -132,6 +134,25 @@ window.onload = function init() {
 				triangles.splice(offset, 2);
 				gridObj.triangles.splice(offset, 2);
 			}
+
+			// Rectangles
+			var rectangles = [];
+			for (var i = 0; i < output.length - 2; i+=2) {
+				console.log(i);
+				rectangles.push([output[i], output[i+1], output[i+3], output[i+2]]);
+			}
+			console.log(rectangles);
+			console.log(rectangles[4]);
+			var numRectanglesPerRow = numTrianglesPerRow / 2;
+			offset = 0;
+
+			// Splice stuff
+			for (var i = 1; i < n; i++) {
+				offset = offset + numRectanglesPerRow;
+				rectangles.splice(offset, 1);
+				// gridObj.triangles.splice(offset, 2);
+			}
+			console.log(rectangles);
 		}
 
 		generateGridVertices(n)
@@ -141,8 +162,10 @@ window.onload = function init() {
 	}
 
 	grid = Grid(n);
+	grid.diffuseMap = "moss-diffuse.jpg";
+	grid.normalMap = "moss-normal.jpg";
 	objInit(grid);
-	console.log(grid);
+	console.log(grid);	
 
 	var m = mult(scalem(3,3,3),rotateX(90));
 	m = mult(translate(0,-0.9,0), m);
@@ -178,7 +201,9 @@ function render(now){
 	gl.uniform1f(Locations.cube, 0.0);
 
 	gl.depthMask(false);
+	gl.uniform1f(Locations.terrain, 1.0);
 	grid.draw();
+	gl.uniform1f(Locations.terrain, 0.0);
 	// gl.depthMask(true);
 
 	TB = mat4();

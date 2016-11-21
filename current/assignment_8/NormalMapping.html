@@ -79,7 +79,7 @@ precision highp float;
 
 uniform vec3 Ka, Kd, Ks, Ia, Id, Is, lightPosition, cameraPosition;
 uniform float shininess;
-uniform float cube;
+uniform float cube, terrain;
 uniform int usingDiffuseMap, usingNormalMap;
 uniform sampler2D diffuseMapSampler, normalMapSampler;
 uniform mat3 N, TBN;
@@ -111,7 +111,9 @@ void main(){
 	vec3 normal;
 
 	if (cube == 1.0) {
-		gl_FragColor = texture2D(normalMapSampler, fTexCoord);
+		gl_FragColor = texture2D(diffuseMapSampler, fTexCoord);
+	} else if (terrain == 1.0) {
+		gl_FragColor = texture2D(diffuseMapSampler, fTexCoord);
 	} else {
 		// gl_FragColor = vec4( 1.0, 0.5, 0.45, 1.0 );
 		if(usingDiffuseMap == 1){

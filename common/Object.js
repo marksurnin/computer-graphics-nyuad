@@ -10,6 +10,7 @@ function objInit(Obj){
 	var normalsPresent = (Obj.normals!==undefined) && (Obj.normals.length > 0);	
 	var texCoordsPresent = (Obj.texCoords!==undefined) && (Obj.texCoords.length > 0);
 	var usingDiffuseMap = texCoordsPresent && (Obj.diffuseMap!==undefined) && (Obj.diffuseMap!== "");
+	console.log(texCoordsPresent);
 	var usingNormalMap = texCoordsPresent && (Obj.normalMap!==undefined) && (Obj.normalMap!== "");
 		
 	 /* get attribute and uniform locations */
