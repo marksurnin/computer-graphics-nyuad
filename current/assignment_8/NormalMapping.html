@@ -23,17 +23,42 @@ attribute vec3 vNormal,vTangent,vBitangent;
 attribute vec2 vTexCoord;
 
 uniform mat4 M, TB, VP;
+uniform mat3 TBNT;
 
 varying vec3 fNormal, fPosition, fTangent, fBitangent;
 varying vec2 fTexCoord;
+
+float calcZ(float x, float y) {
+  // Code for the bell-shaped object
+  if (x == 0.0 && y == 0.0) {
+    return 1.0;
+  } else {
+    float r;
+    r = sqrt(pow(x, 2.0) + pow(y, 2.0));
+    return(sin(20.0 * r)/(20.0 * r));
+  }
+}
+
+vec3 computeNormal(float x, float y) {
+  float delta = 0.001;
+  float n1, n2;
+  n1 = (calcZ(x+delta, y) - calcZ(x, y))/delta;
+  n2 = (calcZ(x, y+delta) - calcZ(x, y))/delta;
+  return normalize(vec3(-n1,-n2, 1.0));
+}
 
 void main(){
 
 	vec4 wPos = TB*M*vPosition; // world position
 
-	vec4 v = VP*wPos;   
+	vec4 v = VP*wPos;  
+	// v.z = calcZ(v.x, v.y);
 	v.z = -v.z; // compensate for left handed coordinate system used by WebGL
 	gl_Position = v;
+
+	//Compute normal
+  // vec3 normal = computeNormal(v.x, v.y);
+  // fNormal = TBNT*normal;
 
 	fPosition = wPos.xyz;
 
@@ -52,6 +77,7 @@ precision highp float;
 
 uniform vec3 Ka, Kd, Ks, Ia, Id, Is, lightPosition, cameraPosition;
 uniform float shininess;
+uniform float cube;
 uniform int usingDiffuseMap, usingNormalMap;
 uniform sampler2D diffuseMapSampler, normalMapSampler;
 uniform mat3 N, TBN;
@@ -67,7 +93,7 @@ vec4 computeColor(vec3 position, vec3 normal) {
 	vec3 lightDir = normalize(lightPosition - position);
 	vec3 viewDir = normalize(cameraPosition - position);
 
-	vec3 ambient = Ia*Ka ;
+	vec3 ambient = Ia*Ka;
 	
 	vec3 diffuse = Id*kd* max(0.0, dot(normal, lightDir));
 	
@@ -82,25 +108,30 @@ vec4 computeColor(vec3 position, vec3 normal) {
 void main(){
 	vec3 normal;
 
-	if(usingDiffuseMap == 1){
-		kd = texture2D(diffuseMapSampler, fTexCoord).rgb;
-	}
-	else{
-		kd = Kd;
-	}
+	if (cube == 1.0) {
+		gl_FragColor = texture2D(normalMapSampler, fTexCoord);
+	} else {
+		gl_FragColor = vec4( 1.0, 0.5, 0.45, 1.0 );
+		// if(usingDiffuseMap == 1){
+		// 	kd = texture2D(diffuseMapSampler, fTexCoord).rgb;
+		// }
+		// else{
+		// 	kd = Kd;
+		// }
 
-	if(usingNormalMap == 1){
-		vec3 c = texture2D(normalMapSampler, fTexCoord).rgb;
-		c = 2.0*c - vec3(1.0,1.0,1.0);
-		normal = c.r*fTangent + c.g*fBitangent+ c.b*fNormal;
-	}
-	else{
-		normal = fNormal;
-	}
+		// if(usingNormalMap == 1){
+		// 	vec3 c = texture2D(normalMapSampler, fTexCoord).rgb;
+		// 	c = 2.0*c - vec3(1.0,1.0,1.0);
+		// 	normal = c.r*fTangent + c.g*fBitangent+ c.b*fNormal;
+		// }
+		// else{
+		// 	normal = fNormal;
+		// }
 
-	normal = normalize(TBN*N*normal);
+		// normal = normalize(TBN*N*normal);
 
-	gl_FragColor = computeColor(fPosition, normal);
+		// gl_FragColor = computeColor(fPosition, normal);
+	}
 }
 </script>
 </head>

@@ -1,7 +1,7 @@
 "use strict";
 
 // global variables
-var gl, canvas, program, grid;
+var gl, canvas, program, grid, cube;
 
 var camera; 	// camera object
 var trackball; 	// virtual trackball 
@@ -30,7 +30,7 @@ window.onload = function init() {
 
 	// Get Locations of attributes and Locations
 	var Attributes = [];
-	var Uniforms = ["VP", "TB", "TBN", "cameraPosition", "Ia", "Id", "Is", "lightPosition"];
+	var Uniforms = ["VP", "TB", "TBN", "cameraPosition", "Ia", "Id", "Is", "lightPosition", "cube"];
 
 	Locations = getLocations(Attributes, Uniforms); // defined in Utils.js
  
@@ -169,7 +169,9 @@ function render(now){
 	var cameraPosition = camera.getFrame().e;
 	gl.uniform3fv(Locations.cameraPosition, flatten(cameraPosition));
 
+  gl.uniform1f(Locations.cube, 1.0);
 	obj1.draw();
+	gl.uniform1f(Locations.cube, 0.0);
 
 	TB = mat4();
 	gl.uniformMatrix4fv(Locations.TB, gl.FALSE, flatten(TB));
@@ -178,7 +180,7 @@ function render(now){
 	gl.uniformMatrix3fv(Locations.TBN, gl.FALSE, flatten(TBN));
 
 	// obj2.draw();
-	grid.draw();
+	// grid.draw();
 }
 
 //-------------------------- CREATE SPHERE ----------------------------------- 
