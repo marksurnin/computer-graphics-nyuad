@@ -144,7 +144,8 @@ window.onload = function init() {
 	objInit(grid);
 	console.log(grid);
 
-	var m = mult(scalem(2,2,2),rotateX(90));
+	var m = mult(scalem(3,3,3),rotateX(90));
+	m = mult(translate(0,-0.9,0), m);
 	grid.setModelMatrix(m);
 
 
@@ -156,7 +157,7 @@ function render(now){
 	
 	requestAnimationFrame(render);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	
+
 	var TB = trackballWorldMatrix(trackball, camera);
 	gl.uniformMatrix4fv(Locations.TB, gl.FALSE, flatten(TB));
 
@@ -176,6 +177,10 @@ function render(now){
 	obj1.draw();
 	gl.uniform1f(Locations.cube, 0.0);
 
+	gl.depthMask(false);
+	grid.draw();
+	// gl.depthMask(true);
+
 	TB = mat4();
 	gl.uniformMatrix4fv(Locations.TB, gl.FALSE, flatten(TB));
 
@@ -183,7 +188,6 @@ function render(now){
 	gl.uniformMatrix3fv(Locations.TBN, gl.FALSE, flatten(TBN));
 
 	// obj2.draw();
-	// grid.draw();
 }
 
 //-------------------------- CREATE SPHERE ----------------------------------- 
