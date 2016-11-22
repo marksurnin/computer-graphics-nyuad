@@ -69,13 +69,13 @@ window.onload = function init() {
 	obj1.setModelMatrix(rotateX(90));
 
 
-	// obj2 = Square();
-	// obj2.diffuseMap = "Textures/brick-diffuse.jpg";
-	// obj2.normalMap = "Textures/brick-normal.jpg";
-	// objInit(obj2);
-	// var m = mult(scalem(2,2,2),rotateX(90));
-	// m = mult(translate(0,-1.5,0), m);
-	// obj2.setModelMatrix(m);
+	obj2 = Square();
+	obj2.diffuseMap = "Textures/moss-diffuse.jpg";
+	obj2.normalMap = "Textures/moss-normal.jpg";
+	objInit(obj2);
+	var m = mult(scalem(30,30,30),rotateX(90));
+	m = mult(translate(0,-1.0,0), m);
+	obj2.setModelMatrix(m);
 
 
 	// Grid code from previous assignment
@@ -204,7 +204,7 @@ function render(now){
 
 	gl.depthMask(false);
 	gl.uniform1f(Locations.terrain, 1.0);
-	grid.draw();
+	// grid.draw();
 	gl.uniform1f(Locations.terrain, 0.0);
 	// gl.depthMask(true);
 
@@ -214,7 +214,7 @@ function render(now){
 	TBN = mat3();
 	gl.uniformMatrix3fv(Locations.TBN, gl.FALSE, flatten(TBN));
 
-	// obj2.draw();
+	obj2.draw();
 }
 
 //-------------------------- CREATE SPHERE ----------------------------------- 

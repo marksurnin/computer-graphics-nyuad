@@ -117,14 +117,14 @@ void main(){
 	} else {
 		// gl_FragColor = vec4( 1.0, 0.5, 0.45, 1.0 );
 		if(usingDiffuseMap == 1){
-			kd = texture2D(diffuseMapSampler, fTexCoord).rgb;
+			kd = texture2D(diffuseMapSampler, fTexCoord*20.0).rgb;
 		}
 		else{
 			kd = Kd;
 		}
 
 		if(usingNormalMap == 1){
-			vec3 c = texture2D(normalMapSampler, fTexCoord).rgb;
+			vec3 c = texture2D(normalMapSampler, fTexCoord*20.0).rgb;
 			c = 2.0*c - vec3(1.0,1.0,1.0);
 			normal = c.r*fTangent + c.g*fBitangent+ c.b*fNormal;
 		}
