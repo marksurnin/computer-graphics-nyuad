@@ -80,7 +80,7 @@ window.onload = function init() {
 
 	// Grid code from previous assignment
 	var l = 1.0;
-	var n = 2; // Cool stuff when n is 6, 10. 20 is super crazy, at your own risk, please :)
+	var n = 40; // Cool stuff when n is 6, 10. 20 is super crazy, at your own risk, please :)
 
 	function Grid(n) {
 		var gridObj = {};
@@ -116,7 +116,7 @@ window.onload = function init() {
 			for (var i = 0; i < n*(n+1); i++) {
 				output.push(i, i+n+1);
 			}
-			console.log(output);
+			// console.log(output);
 
 			var triangles = [];
 			for (var i = 0; i < output.length - 2; i++) {
@@ -124,7 +124,7 @@ window.onload = function init() {
 				gridObj.triangles.push([output[i], output[i+1], output[i+2]]);
 			}
 			var numTrianglesPerRow = Math.floor(triangles.length/n) - 1;
-			console.log(triangles);
+			// console.log(triangles);
 
 			var offset = 0;
 
@@ -138,11 +138,11 @@ window.onload = function init() {
 			// Rectangles
 			var rectangles = [];
 			for (var i = 0; i < output.length - 2; i+=2) {
-				console.log(i);
+				// console.log(i);
 				rectangles.push([output[i], output[i+1], output[i+3], output[i+2]]);
 			}
-			console.log(rectangles);
-			console.log(rectangles[4]);
+			// console.log(rectangles);
+			// console.log(rectangles[4]);
 			var numRectanglesPerRow = numTrianglesPerRow / 2;
 			offset = 0;
 
@@ -153,6 +153,7 @@ window.onload = function init() {
 				// gridObj.triangles.splice(offset, 2);
 			}
 			console.log(rectangles);
+			// gridObj.texCoords = rectangles;
 		}
 
 		generateGridVertices(n)
@@ -196,6 +197,7 @@ function render(now){
 	var cameraPosition = camera.getFrame().e;
 	gl.uniform3fv(Locations.cameraPosition, flatten(cameraPosition));
 
+	obj1.setModelMatrix(mult(translate(cameraPosition), rotateX(90)));
   gl.uniform1f(Locations.cube, 1.0);
 	obj1.draw();
 	gl.uniform1f(Locations.cube, 0.0);

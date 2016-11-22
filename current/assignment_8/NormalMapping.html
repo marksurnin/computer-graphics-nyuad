@@ -112,8 +112,8 @@ void main(){
 
 	if (cube == 1.0) {
 		gl_FragColor = texture2D(diffuseMapSampler, fTexCoord);
-	} else if (terrain == 1.0) {
-		gl_FragColor = texture2D(diffuseMapSampler, fTexCoord);
+	// } else if (terrain == 1.0) {
+	// 	gl_FragColor = texture2D(diffuseMapSampler, fTexCoord);
 	} else {
 		// gl_FragColor = vec4( 1.0, 0.5, 0.45, 1.0 );
 		if(usingDiffuseMap == 1){
@@ -146,3 +146,6 @@ void main(){
 </body>
 </html>
 
+<!-- m - # of cells in the grid per row
+m - # texture tiles that fit completely
+coords = (i,j) = m/n(i,j) -->
