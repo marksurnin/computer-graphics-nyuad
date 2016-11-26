@@ -28,6 +28,7 @@ uniform float cube;
 uniform mat4 cameraProjection;
 uniform sampler2D textureSampler, normalMapSampler;
 
+varying vec4 v;
 varying vec3 fNormal, fPosition, fTangent, fBitangent;
 varying vec2 fTexCoord;
 
@@ -54,11 +55,11 @@ void main(){
 
 	vec4 wPos = TB*M*vPosition; // world position
 
-	vec4 v = VP*wPos;
+	v = VP*wPos;
 
 	// if (cube == 0.0) {
-		// float height = texture2D(textureSampler, fTexCoord).r;
-		// v.z = height*10.0;
+	// 	float height = texture2D(textureSampler, fTexCoord).r;
+	// 	v.z = height*10.0;
 	// }
 
 	// v.z = calcZ(v.x, v.y);
@@ -88,10 +89,10 @@ uniform vec3 Ka, Kd, Ks, Ia, Id, Is, lightPosition, cameraPosition;
 uniform float shininess;
 uniform float cube, terrain;
 uniform int usingDiffuseMap, usingNormalMap;
-uniform sampler2D diffuseMapSampler, normalMapSampler;
+uniform sampler2D diffuseMapSampler, normalMapSampler, heightMap;
 uniform mat3 N, TBN;
 
-varying vec4 fColor;
+varying vec4 fColor, v;
 varying vec3 fNormal, fPosition, fTangent, fBitangent;
 varying vec2 fTexCoord;
 vec3 kd;
@@ -120,8 +121,8 @@ void main(){
 	if (cube == 1.0) {
 		gl_FragColor = texture2D(diffuseMapSampler, fTexCoord);
 	} else if (terrain == 1.0) {
-		gl_FragColor = texture2D(diffuseMapSampler, fTexCoord);
-	} else {
+		// gl_FragColor = texture2D(diffuseMapSampler, fTexCoord);
+	// } else {
 		// gl_FragColor = vec4( 1.0, 0.5, 0.45, 1.0 );
 		if(usingDiffuseMap == 1){
 			kd = texture2D(diffuseMapSampler, fTexCoord*20.0).rgb;

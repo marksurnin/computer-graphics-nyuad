@@ -4,7 +4,7 @@ function objInit(Obj){
 	var tBuffer, tanBuffer, bitanBuffer;
 	var modelMatrix = mat4();
 	var normalMatrix = mat3();
-	var diffuseMapTexture, normalMapTexture; 
+	var diffuseMapTexture, normalMapTexture, heightMapTexture; 
 	
 	var trianglesPresent = (Obj.triangles !== undefined) && (Obj.triangles.length > 0);		
 	var normalsPresent = (Obj.normals!==undefined) && (Obj.normals.length > 0);	
@@ -42,7 +42,7 @@ function objInit(Obj){
 		Obj.material = {	
 			Ka: vec3(1.0, 1.0, 1.0),
 			Kd: vec3(Math.random(), Math.random(), Math.random()),
-			Ks: vec3(0.4, 0.4, 0.4),
+			Ks: vec3(0.0, 0.0, 0.0),
 			shininess: 500*Math.random() 
 		};
 	}

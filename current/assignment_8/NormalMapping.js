@@ -79,7 +79,7 @@ window.onload = function init() {
 
 
 	// Grid code from previous assignment
-	var n = 40;
+	var n = 10;
 
 	function Grid(n){
 		// n ( >=2 ) is the number of vertices in a row or column.
@@ -132,11 +132,11 @@ window.onload = function init() {
 
 	grid = Grid(n);
 	grid.diffuseMap = "Textures/brick2.jpg";
-	// grid.normalMap = "moss-normal.jpg";
+	grid.normalMap = "Textures/brick2-normal.jpg";
 	objInit(grid);
 	console.log(grid);	
 
-	var m = mult(scalem(10,10,10),rotateX(90));
+	var m = mult(scalem(50,50,50),rotateX(90));
 	m = mult(translate(0,-0.5,0), m);
 	grid.setModelMatrix(m);
 
