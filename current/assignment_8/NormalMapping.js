@@ -69,13 +69,13 @@ window.onload = function init() {
 	obj1.setModelMatrix(rotateX(90));
 
 
-	obj2 = Square();
-	obj2.diffuseMap = "Textures/moss-diffuse.jpg";
-	obj2.normalMap = "Textures/moss-normal.jpg";
-	objInit(obj2);
-	var m = mult(scalem(30,30,30),rotateX(90));
-	m = mult(translate(0,-1.0,0), m);
-	obj2.setModelMatrix(m);
+	// obj2 = Square();
+	// obj2.diffuseMap = "Textures/moss-diffuse.jpg";
+	// obj2.normalMap = "Textures/moss-normal.jpg";
+	// objInit(obj2);
+	// var m = mult(scalem(30,30,30),rotateX(90));
+	// m = mult(translate(0,-1.0,0), m);
+	// obj2.setModelMatrix(m);
 
 
 	// Grid code from previous assignment
@@ -110,7 +110,6 @@ window.onload = function init() {
 		for(i=0; i<n-1; ++i){
 			for(j=0; j<n-1; ++j){
 				idx = n*j + i;
-				console.log((G.positions[idx][0] + 1)/2, (G.positions[idx][1] + 1)/2, (G.positions[idx+n][0] + 1)/2, (G.positions[idx+n][1] + 1)/2, (G.positions[idx+n+1][0] + 1)/2, (G.positions[idx+n+1][1] + 1)/2, (G.positions[idx+1][0] + 1)/2, (G.positions[idx+1][1] + 1)/2);
 				G.texCoords.push((G.positions[idx][0] + 1)/2, (G.positions[idx][1] + 1)/2, (G.positions[idx+n][0] + 1)/2, (G.positions[idx+n][1] + 1)/2, (G.positions[idx+n+1][0] + 1)/2, (G.positions[idx+n+1][1] + 1)/2, (G.positions[idx+1][0] + 1)/2, (G.positions[idx+1][1] + 1)/2);
 			}
 		}
@@ -161,9 +160,9 @@ function render(now){
 
 	gl.depthMask(false);
 	gl.uniform1f(Locations.terrain, 1.0);
-	// grid.draw();
+	grid.draw();
 	gl.uniform1f(Locations.terrain, 0.0);
-	// gl.depthMask(true);
+	gl.depthMask(true);
 
 	TB = mat4();
 	gl.uniformMatrix4fv(Locations.TB, gl.FALSE, flatten(TB));
@@ -171,7 +170,7 @@ function render(now){
 	TBN = mat3();
 	gl.uniformMatrix3fv(Locations.TBN, gl.FALSE, flatten(TBN));
 
-	obj2.draw();
+	// obj2.draw();
 }
 
 //-------------------------- CREATE SPHERE ----------------------------------- 

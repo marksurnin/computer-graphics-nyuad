@@ -26,6 +26,7 @@ uniform mat4 M, TB, VP;
 uniform mat3 TBNT;
 uniform float cube;
 uniform mat4 cameraProjection;
+uniform sampler2D textureSampler, normalMapSampler;
 
 varying vec3 fNormal, fPosition, fTangent, fBitangent;
 varying vec2 fTexCoord;
@@ -53,7 +54,13 @@ void main(){
 
 	vec4 wPos = TB*M*vPosition; // world position
 
-	vec4 v = VP*wPos;  
+	vec4 v = VP*wPos;
+
+	if (cube == 0.0) {
+		float height = texture2D(textureSampler, fTexCoord).r;
+		v.z = height*10.0;
+	}
+
 	// v.z = calcZ(v.x, v.y);
 	v.z = -v.z; // compensate for left handed coordinate system used by WebGL
 	gl_Position = v;

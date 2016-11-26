@@ -119,7 +119,6 @@ function Grid(n){
 	for(i=0; i<n-1; ++i){
 		for(j=0; j<n-1; ++j){
 			idx = n*i + j;
-			console.log(idx, idx+n, idx+n+1, idx+1)
 			G.triangles.push([idx, idx+n, idx+n+1], [idx, idx+n+1, idx+1]);
 		}
 	}

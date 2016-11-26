@@ -247,9 +247,9 @@ function objInit(Obj){
 			E2 = subtract(vec3(pos[c]), vec3(pos[b]));
 			DU1 = tex[b][0] - tex[a][0];
 			DV1 = tex[b][1] - tex[a][1];
-			console.log(tex[a]);
-			console.log(tex[b]);
-			console.log(tex[c]);
+			// console.log(tex[a]);
+			// console.log(tex[b]);
+			// console.log(tex[c]);
 			DU2 = tex[c][0] - tex[b][0];
 			DV2 = tex[c][1] - tex[b][1];
 			B = vec3();
