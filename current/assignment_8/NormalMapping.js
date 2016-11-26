@@ -8,7 +8,7 @@ var trackball; 	// virtual trackball
 
 var Locations;  // object containing location ids of shader variables 
 
-var obj1, obj2;
+var obj1, obj2, teapot;
 
 window.onload = function init() {
 	// Set up WebGL
@@ -142,6 +142,11 @@ window.onload = function init() {
 	m = mult(translate(0,-0.5,0), m);
 	grid.setModelMatrix(m);
 
+	objInit(teapot);
+	var m = mult(scalem(0.003,0.003,0.003),rotateX(0));
+	m = mult(translate(0,0,-1), m);
+	teapot.setModelMatrix(m);
+
 
 	requestAnimationFrame(render);
 
@@ -176,7 +181,7 @@ function render(now){
 	gl.depthMask(false);
 	grid.draw();
 	gl.uniform1f(Locations.terrain, 0.0);
-	// gl.depthMask(true);
+	gl.depthMask(true);
 
 	// TB = mat4();
 	// gl.uniformMatrix4fv(Locations.TB, gl.FALSE, flatten(TB));
@@ -185,6 +190,7 @@ function render(now){
 	// gl.uniformMatrix3fv(Locations.TBN, gl.FALSE, flatten(TBN));
 
 	// obj2.draw();
+	teapot.draw();
 }
 
 //-------------------------- CREATE SPHERE ----------------------------------- 

@@ -11,6 +11,8 @@
 <script type="text/javascript" src="../../common/Camera.js"></script>
 <script type="text/javascript" src="../../common/Object.js"></script>
 <script type="text/javascript" src="../../common/Utils.js"></script>
+<script type="text/javascript" src="teapot.js"></script> 
+
 
 <script type="text/javascript" src="NormalMapping.js"></script> 
 
@@ -125,7 +127,7 @@ void main(){
 
 	if (cube == 1.0) {
 		gl_FragColor = texture2D(diffuseMapSampler, fTexCoord);
-	} else if (terrain == 1.0) {
+	} else {
 		// gl_FragColor = texture2D(diffuseMapSampler, fTexCoord);
 	// } else {
 		// gl_FragColor = vec4( 1.0, 0.5, 0.45, 1.0 );
