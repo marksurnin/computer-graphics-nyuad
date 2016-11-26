@@ -82,6 +82,7 @@ window.onload = function init() {
 	var l = 1.0;
 	var n = 40; // Cool stuff when n is 6, 10. 20 is super crazy, at your own risk, please :)
 
+	/*
 	function Grid(n) {
 		var gridObj = {};
 		gridObj.positions = [];
@@ -97,17 +98,16 @@ window.onload = function init() {
 				next.x = -l;
 				prev.x = -l;
 
-				// vertices.push(vec3(next.x, next.y, 0));
 				gridObj.positions.push(vec3(next.x, next.y, 0));
 				for (var col = 0; col < n; col++) {
 					next.x = prev.x + 2*l/n;
-					// vertices.push(vec3(next.x, next.y, 0));
 					gridObj.positions.push(vec3(next.x, next.y, 0));
 					prev.x = next.x;
 				}
 				next.y = prev.y + 2*l/n;
 				prev.y = next.y;
 			}
+			// console.log(gridObj.positions);
 		}
 
 		function triangulate(n) {
@@ -139,7 +139,7 @@ window.onload = function init() {
 			var rectangles = [];
 			for (var i = 0; i < output.length - 2; i+=2) {
 				// console.log(i);
-				rectangles.push([output[i], output[i+1], output[i+3], output[i+2]]);
+				rectangles.push([output[i], output[i+2], output[i+3], output[i+1]]);
 			}
 			// console.log(rectangles);
 			// console.log(rectangles[4]);
@@ -161,10 +161,49 @@ window.onload = function init() {
 
 		return gridObj;
 	}
+	*/
+
+	function Grid(n){
+		// n ( >=2 ) is the number of vertices in a row or column.
+		// The function returns an n x n grid.
+
+		var i,j, idx;
+
+		var G = {
+			positions: [],
+			triangles: [],
+			texCoords: []
+		};
+
+
+		for(i=0; i<n; ++i){
+			for(j=0; j<n; ++j){
+				G.positions.push( [-1+2*i/(n-1), -1+2*j/(n-1), 0] );
+			}
+		}
+
+		for(i=0; i<n-1; ++i){
+			for(j=0; j<n-1; ++j){
+				idx = n*i + j;
+				G.triangles.push([idx, idx+n, idx+n+1], [idx, idx+n+1, idx+1]);
+			}
+		}
+
+		for(i=0; i<n-1; ++i){
+			for(j=0; j<n-1; ++j){
+				idx = n*j + i;
+				console.log((G.positions[idx][0] + 1)/2, (G.positions[idx][1] + 1)/2, (G.positions[idx+n][0] + 1)/2, (G.positions[idx+n][1] + 1)/2, (G.positions[idx+n+1][0] + 1)/2, (G.positions[idx+n+1][1] + 1)/2, (G.positions[idx+1][0] + 1)/2, (G.positions[idx+1][1] + 1)/2);
+				G.texCoords.push((G.positions[idx][0] + 1)/2, (G.positions[idx][1] + 1)/2, (G.positions[idx+n][0] + 1)/2, (G.positions[idx+n][1] + 1)/2, (G.positions[idx+n+1][0] + 1)/2, (G.positions[idx+n+1][1] + 1)/2, (G.positions[idx+1][0] + 1)/2, (G.positions[idx+1][1] + 1)/2);
+			}
+		}
+		console.log(G.texCoords);
+
+		return G;
+	}
 
 	grid = Grid(n);
 	grid.diffuseMap = "moss-diffuse.jpg";
-	grid.normalMap = "moss-normal.jpg";
+	// grid.normalMap = "moss-normal.jpg";
 	objInit(grid);
 	console.log(grid);	
 

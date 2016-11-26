@@ -10,10 +10,9 @@ function objInit(Obj){
 	var normalsPresent = (Obj.normals!==undefined) && (Obj.normals.length > 0);	
 	var texCoordsPresent = (Obj.texCoords!==undefined) && (Obj.texCoords.length > 0);
 	var usingDiffuseMap = texCoordsPresent && (Obj.diffuseMap!==undefined) && (Obj.diffuseMap!== "");
-	console.log(texCoordsPresent);
 	var usingNormalMap = texCoordsPresent && (Obj.normalMap!==undefined) && (Obj.normalMap!== "");
-		
-	 /* get attribute and uniform locations */
+	
+	/* get attribute and uniform locations */
 	var Attributes = ["vPosition", "vNormal"];
 	if(texCoordsPresent)  Attributes.push("vTexCoord");
 	if(usingNormalMap) Attributes.push("vTangent", "vBitangent");
@@ -248,6 +247,9 @@ function objInit(Obj){
 			E2 = subtract(vec3(pos[c]), vec3(pos[b]));
 			DU1 = tex[b][0] - tex[a][0];
 			DV1 = tex[b][1] - tex[a][1];
+			console.log(tex[a]);
+			console.log(tex[b]);
+			console.log(tex[c]);
 			DU2 = tex[c][0] - tex[b][0];
 			DV2 = tex[c][1] - tex[b][1];
 			B = vec3();
