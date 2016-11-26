@@ -100,6 +100,8 @@ window.onload = function init() {
 			}
 		}
 
+		console.log(G.positions);
+
 		for(i=0; i<n-1; ++i){
 			for(j=0; j<n-1; ++j){
 				idx = n*i + j;
@@ -107,25 +109,35 @@ window.onload = function init() {
 			}
 		}
 
-		for(i=0; i<n-1; ++i){
-			for(j=0; j<n-1; ++j){
-				idx = n*j + i;
-				G.texCoords.push((G.positions[idx][0] + 1)/2, (G.positions[idx][1] + 1)/2, (G.positions[idx+n][0] + 1)/2, (G.positions[idx+n][1] + 1)/2, (G.positions[idx+n+1][0] + 1)/2, (G.positions[idx+n+1][1] + 1)/2, (G.positions[idx+1][0] + 1)/2, (G.positions[idx+1][1] + 1)/2);
+		for(i=0; i<n; ++i){
+			for(j=0; j<n; ++j){
+				idx = n*i + j;
+				G.texCoords.push( [i/(n-1)*n, j/(n-1)*n]
+													// (G.positions[idx][0] + 1)/2,
+													// (G.positions[idx][1] + 1)/2,
+													// (G.positions[idx+1][0] + 1)/2,
+													// (G.positions[idx+1][1] + 1)/2,
+													// (G.positions[idx+n][0] + 1)/2,
+													// (G.positions[idx+n][1] + 1)/2,
+													// (G.positions[idx+n+1][0] + 1)/2,
+													// (G.positions[idx+n+1][1] + 1)/2
+												);
 			}
 		}
+
 		console.log(G.texCoords);
 
 		return G;
 	}
 
 	grid = Grid(n);
-	grid.diffuseMap = "moss-diffuse.jpg";
+	grid.diffuseMap = "Textures/brick2.jpg";
 	// grid.normalMap = "moss-normal.jpg";
 	objInit(grid);
 	console.log(grid);	
 
-	var m = mult(scalem(3,3,3),rotateX(90));
-	m = mult(translate(0,-0.9,0), m);
+	var m = mult(scalem(10,10,10),rotateX(90));
+	m = mult(translate(0,-0.5,0), m);
 	grid.setModelMatrix(m);
 
 
@@ -158,17 +170,17 @@ function render(now){
 	obj1.draw();
 	gl.uniform1f(Locations.cube, 0.0);
 
-	gl.depthMask(false);
 	gl.uniform1f(Locations.terrain, 1.0);
+	gl.depthMask(false);
 	grid.draw();
 	gl.uniform1f(Locations.terrain, 0.0);
-	gl.depthMask(true);
+	// gl.depthMask(true);
 
-	TB = mat4();
-	gl.uniformMatrix4fv(Locations.TB, gl.FALSE, flatten(TB));
+	// TB = mat4();
+	// gl.uniformMatrix4fv(Locations.TB, gl.FALSE, flatten(TB));
 
-	TBN = mat3();
-	gl.uniformMatrix3fv(Locations.TBN, gl.FALSE, flatten(TBN));
+	// TBN = mat3();
+	// gl.uniformMatrix3fv(Locations.TBN, gl.FALSE, flatten(TBN));
 
 	// obj2.draw();
 }
