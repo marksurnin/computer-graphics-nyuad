@@ -24,9 +24,11 @@ attribute vec2 vTexCoord;
 
 uniform mat4 M, TB, VP;
 uniform mat3 TBNT;
-uniform float cube;
+uniform float cube, terrain;
 uniform mat4 cameraProjection;
-uniform sampler2D textureSampler, normalMapSampler;
+uniform sampler2D textureSampler, normalMapSampler, heightMapSampler;
+uniform int usingHeightMap;
+
 
 varying vec4 v;
 varying vec3 fNormal, fPosition, fTangent, fBitangent;
@@ -57,10 +59,13 @@ void main(){
 
 	v = VP*wPos;
 
-	// if (cube == 0.0) {
-	// 	float height = texture2D(textureSampler, fTexCoord).r;
-	// 	v.z = height*10.0;
-	// }
+	if (terrain == 1.0) {
+		if (usingHeightMap == 1) {
+			v.z = texture2D(heightMapSampler, vTexCoord).r;
+		} else {
+			v.z = 0.0;
+		}
+	}
 
 	// v.z = calcZ(v.x, v.y);
 	v.z = -v.z; // compensate for left handed coordinate system used by WebGL
@@ -89,7 +94,7 @@ uniform vec3 Ka, Kd, Ks, Ia, Id, Is, lightPosition, cameraPosition;
 uniform float shininess;
 uniform float cube, terrain;
 uniform int usingDiffuseMap, usingNormalMap;
-uniform sampler2D diffuseMapSampler, normalMapSampler, heightMap;
+uniform sampler2D diffuseMapSampler, normalMapSampler, heightMapSampler;
 uniform mat3 N, TBN;
 
 varying vec4 fColor, v;
@@ -139,6 +144,12 @@ void main(){
 		else{
 			normal = fNormal;
 		}
+
+		// if (usingHeightMap == 1) {
+		// 	v.z = texture2D(heightMapSampler, fTexCoord*20.0).r;
+		// } else {
+		// 	v.z = 0.0;
+		// }
 
 		normal = normalize(TBN*N*normal);
 

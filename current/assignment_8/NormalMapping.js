@@ -133,6 +133,8 @@ window.onload = function init() {
 	grid = Grid(n);
 	grid.diffuseMap = "Textures/brick2.jpg";
 	grid.normalMap = "Textures/brick2-normal.jpg";
+	grid.heightMap = "heightmap.jpg";
+
 	objInit(grid);
 	console.log(grid);	
 
