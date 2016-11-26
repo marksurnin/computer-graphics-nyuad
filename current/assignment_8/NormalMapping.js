@@ -1,7 +1,7 @@
 "use strict";
 
 // global variables
-var gl, canvas, program, grid, cube, terrain;
+var gl, canvas, program, grid, cube, terrain, teapot;
 
 var camera; 	// camera object
 var trackball; 	// virtual trackball 
@@ -30,7 +30,7 @@ window.onload = function init() {
 
 	// Get Locations of attributes and Locations
 	var Attributes = [];
-	var Uniforms = ["VP", "TB", "TBN", "cameraPosition", "cameraProjection", "Ia", "Id", "Is", "lightPosition", "cube", "terrain"];
+	var Uniforms = ["VP", "TB", "TBN", "cameraPosition", "cameraProjection", "Ia", "Id", "Is", "lightPosition", "cube", "terrain", "teapot"];
 
 	Locations = getLocations(Attributes, Uniforms); // defined in Utils.js
  
@@ -144,9 +144,8 @@ window.onload = function init() {
 
 	objInit(teapot);
 	var m = mult(scalem(0.003,0.003,0.003),rotateX(0));
-	m = mult(translate(0,0,-1), m);
+	m = mult(translate(0,-0.2,-1), m);
 	teapot.setModelMatrix(m);
-
 
 	requestAnimationFrame(render);
 
@@ -190,7 +189,15 @@ function render(now){
 	// gl.uniformMatrix3fv(Locations.TBN, gl.FALSE, flatten(TBN));
 
 	// obj2.draw();
+
+	var normalMatrix = teapot.getModelMatrix();
+	// gl.uniformMatrix4fv(Locations.)
+
+	gl.uniform1f(Locations.teapot, 1.0);
+	gl.depthMask(false);
 	teapot.draw();
+	gl.uniform1f(Locations.teapot, 0.0);
+	// gl.depthMask(true);
 }
 
 //-------------------------- CREATE SPHERE ----------------------------------- 
