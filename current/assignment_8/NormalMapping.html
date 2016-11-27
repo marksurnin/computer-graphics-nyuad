@@ -32,7 +32,7 @@ uniform mat4 cameraProjection;
 uniform sampler2D textureSampler, normalMapSampler, heightMapSampler;
 uniform int usingHeightMap;
 
-
+varying vec3 R;
 varying vec4 v;
 varying vec3 fNormal, fPosition, fTangent, fBitangent;
 varying vec2 fTexCoord;
@@ -75,8 +75,12 @@ void main(){
 	gl_Position = v;
 
 	//Compute normal
-  // vec3 normal = computeNormal(v.x, v.y);
-  // fNormal = TBNT*normal;
+	vec3 normal = computeNormal(v.x, v.y);
+	fNormal = TBNT*normal;
+
+	vec3 N = normalize(fNormal);
+	vec3 u = v.xyz;
+	R = reflect(u, N);
 
 	fPosition = wPos.xyz;
 
@@ -100,7 +104,10 @@ uniform int usingDiffuseMap, usingNormalMap;
 uniform sampler2D diffuseMapSampler, normalMapSampler, heightMapSampler;
 uniform mat3 N, TBN;
 uniform mat4 VP;
+uniform samplerCube texMap;
 
+
+varying vec3 R;
 varying vec4 fColor, v;
 varying vec3 fNormal, fPosition, fTangent, fBitangent;
 varying vec2 fTexCoord;
@@ -131,7 +138,9 @@ void main(){
 		gl_FragColor = texture2D(diffuseMapSampler, fTexCoord);
 	} else if (teapot == 1.0) {
 		// vec3 N = normalize()
-		gl_FragColor = vec4( 1.0, 0.5, 0.45, 1.0 );
+		// gl_FragColor = vec4( 1.0, 0.5, 0.45, 1.0 );
+		vec4 texColor = textureCube(texMap, R);
+		gl_FragColor = texColor;
 	} else	{
 		// gl_FragColor = texture2D(diffuseMapSampler, fTexCoord);
 	// } else {
