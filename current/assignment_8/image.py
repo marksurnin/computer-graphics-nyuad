@@ -1,5 +1,5 @@
 from PIL import Image
-im = Image.open("heightmap.jpg") #open heightmap
+im = Image.open("current/assignment_8/clouds.jpg") #open heightmap
 pix = im.load()
 
 # print(im.size) #Get the width and hight of the image for iterating over
@@ -7,7 +7,7 @@ pix = im.load()
 width = im.size[0]
 height = im.size[1]
 
-print("positions = [")
+print("var gridHeights = [")
 for w in range(0,width,4):
 	for h in range(0,height,4):
 		print("\t[" + str(w/4) + ", " + str(h/4) + ", " + str(pix[w,h][0]) + "]," );

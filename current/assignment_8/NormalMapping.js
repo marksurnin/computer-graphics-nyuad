@@ -79,8 +79,6 @@ window.onload = function init() {
 
 
 	// Grid code from previous assignment
-	var n = 10;
-
 	function Grid(n){
 		// n ( >=2 ) is the number of vertices in a row or column.
 		// The function returns an n x n grid.
@@ -96,7 +94,10 @@ window.onload = function init() {
 
 		for(i=0; i<n; ++i){
 			for(j=0; j<n; ++j){
-				G.positions.push( [-1+2*i/(n-1), -1+2*j/(n-1), 0] );
+				var rawHeight = gridHeights[n*i+j][2];
+				// console.log(rawHeight/1000);
+				G.positions.push( [-1+2*i/(n-1), -1+2*j/(n-1), rawHeight/2000 - 0.12] );
+				// console.log(gridHeights[n*i+j][2]);
 			}
 		}
 
@@ -117,16 +118,17 @@ window.onload = function init() {
 		return G;
 	}
 
+	var n = 255;
 	grid = Grid(n);
-	grid.diffuseMap = "Textures/brick2.jpg";
-	grid.normalMap = "Textures/brick2-normal.jpg";
+	grid.diffuseMap = "moss-diffuse.jpg";
+	grid.normalMap = "moss-normal.jpg";
 	grid.heightMap = "heightmap.jpg";
 
 	objInit(grid);
 	console.log(grid);
 
-	var m = mult(scalem(50,50,50),rotateX(90));
-	m = mult(translate(0,-0.5,0), m);
+	var m = mult(scalem(100,100,100),rotateX(90));
+	m = mult(translate(0,0,0), m);
 	grid.setModelMatrix(m);
 
 	objInit(teapot);
