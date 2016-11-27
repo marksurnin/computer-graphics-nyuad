@@ -4,24 +4,26 @@ function objInit(Obj){
 	var tBuffer, tanBuffer, bitanBuffer;
 	var modelMatrix = mat4();
 	var normalMatrix = mat3();
-	var diffuseMapTexture, normalMapTexture; 
+	var diffuseMapTexture, normalMapTexture, heightMapTexture; 
 	
 	var trianglesPresent = (Obj.triangles !== undefined) && (Obj.triangles.length > 0);		
 	var normalsPresent = (Obj.normals!==undefined) && (Obj.normals.length > 0);	
 	var texCoordsPresent = (Obj.texCoords!==undefined) && (Obj.texCoords.length > 0);
 	var usingDiffuseMap = texCoordsPresent && (Obj.diffuseMap!==undefined) && (Obj.diffuseMap!== "");
 	var usingNormalMap = texCoordsPresent && (Obj.normalMap!==undefined) && (Obj.normalMap!== "");
-	
+	var usingHeightMap = texCoordsPresent && (Obj.heightMap!==undefined) && (Obj.heightMap!== "");
+
 	/* get attribute and uniform locations */
 	var Attributes = ["vPosition", "vNormal"];
 	if(texCoordsPresent)  Attributes.push("vTexCoord");
 	if(usingNormalMap) Attributes.push("vTangent", "vBitangent");
 
 	var Uniforms = ["Ka", "Kd", "Ks", "shininess", "M", "N",
-					"usingDiffuseMap", "usingNormalMap"];
+					"usingDiffuseMap", "usingNormalMap", "usingHeightMap"];
 
 	if(usingDiffuseMap) Uniforms.push("diffuseMapSampler");
 	if(usingNormalMap) Uniforms.push("normalMapSampler");
+	if(usingHeightMap) Uniforms.push("heightMapSampler");
 
 	var Loc = getLocations(Attributes, Uniforms); /* defined in Utils.js */
 
@@ -42,7 +44,7 @@ function objInit(Obj){
 		Obj.material = {	
 			Ka: vec3(1.0, 1.0, 1.0),
 			Kd: vec3(Math.random(), Math.random(), Math.random()),
-			Ks: vec3(0.4, 0.4, 0.4),
+			Ks: vec3(0.0, 0.0, 0.0),
 			shininess: 500*Math.random() 
 		};
 	}
@@ -95,6 +97,15 @@ function objInit(Obj){
 		}
 		else{
 			gl.uniform1i(Loc.usingNormalMap, 0);
+		}
+
+		if(usingHeightMap){
+			gl.activeTexture(gl.TEXTURE2);
+			gl.bindTexture(gl.TEXTURE_2D, heightMapTexture);
+			gl.uniform1i(Loc.usingHeightMap, 1);
+		}
+		else{
+			gl.uniform1i(Loc.usingHeightMap, 0);
 		}
 		
 		//set material
@@ -163,6 +174,11 @@ function objInit(Obj){
 		if(usingNormalMap){
 			normalMapTexture = setupTexture(Obj.normalMap);
 			gl.uniform1i(Loc.normalMapSampler, 1);
+		}
+
+		if(usingHeightMap){
+			heightMapTexture = setupTexture(Obj.heightMap);
+			gl.uniform1i(Loc.heightMapSampler, 2);
 		}
 	}
 

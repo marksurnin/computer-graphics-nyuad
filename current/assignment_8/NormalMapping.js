@@ -1,14 +1,14 @@
 "use strict";
 
 // global variables
-var gl, canvas, program, grid, cube, terrain;
+var gl, canvas, program, grid, cube, terrain, teapot;
 
 var camera; 	// camera object
 var trackball; 	// virtual trackball 
 
 var Locations;  // object containing location ids of shader variables 
 
-var obj1, obj2;
+var obj1, obj2, teapot;
 
 window.onload = function init() {
 	// Set up WebGL
@@ -30,7 +30,7 @@ window.onload = function init() {
 
 	// Get Locations of attributes and Locations
 	var Attributes = [];
-	var Uniforms = ["VP", "TB", "TBN", "cameraPosition", "cameraProjection", "Ia", "Id", "Is", "lightPosition", "cube", "terrain"];
+	var Uniforms = ["VP", "TB", "TBN", "cameraPosition", "cameraProjection", "Ia", "Id", "Is", "lightPosition", "cube", "terrain", "teapot"];
 
 	Locations = getLocations(Attributes, Uniforms); // defined in Utils.js
  
@@ -79,7 +79,7 @@ window.onload = function init() {
 
 
 	// Grid code from previous assignment
-	var n = 40;
+	var n = 10;
 
 	function Grid(n){
 		// n ( >=2 ) is the number of vertices in a row or column.
@@ -118,15 +118,21 @@ window.onload = function init() {
 	}
 
 	grid = Grid(n);
-	grid.diffuseMap = "Textures/brick-normal.jpg";
-	grid.normalMap = "moss-normal.jpg";
+	grid.diffuseMap = "Textures/brick2.jpg";
+	grid.normalMap = "Textures/brick2-normal.jpg";
+	grid.heightMap = "heightmap.jpg";
+
 	objInit(grid);
 	console.log(grid);
 
-	var m = mult(scalem(10,10,10),rotateX(90));
+	var m = mult(scalem(50,50,50),rotateX(90));
 	m = mult(translate(0,-0.5,0), m);
 	grid.setModelMatrix(m);
 
+	objInit(teapot);
+	var m = mult(scalem(0.003,0.003,0.003),rotateX(0));
+	m = mult(translate(0,-0.2,-1), m);
+	teapot.setModelMatrix(m);
 
 	requestAnimationFrame(render);
 
@@ -161,7 +167,7 @@ function render(now){
 	gl.depthMask(false);
 	grid.draw();
 	gl.uniform1f(Locations.terrain, 0.0);
-	// gl.depthMask(true);
+	gl.depthMask(true);
 
 	// TB = mat4();
 	// gl.uniformMatrix4fv(Locations.TB, gl.FALSE, flatten(TB));
@@ -170,6 +176,15 @@ function render(now){
 	// gl.uniformMatrix3fv(Locations.TBN, gl.FALSE, flatten(TBN));
 
 	// obj2.draw();
+
+	var normalMatrix = teapot.getModelMatrix();
+	// gl.uniformMatrix4fv(Locations.)
+
+	gl.uniform1f(Locations.teapot, 1.0);
+	gl.depthMask(false);
+	teapot.draw();
+	gl.uniform1f(Locations.teapot, 0.0);
+	// gl.depthMask(true);
 }
 
 //-------------------------- CREATE SPHERE ----------------------------------- 
