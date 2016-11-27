@@ -100,8 +100,6 @@ window.onload = function init() {
 			}
 		}
 
-		console.log(G.positions);
-
 		for(i=0; i<n-1; ++i){
 			for(j=0; j<n-1; ++j){
 				idx = n*i + j;
@@ -112,29 +110,18 @@ window.onload = function init() {
 		for(i=0; i<n; ++i){
 			for(j=0; j<n; ++j){
 				idx = n*i + j;
-				G.texCoords.push( [i/(n-1)*n, j/(n-1)*n]
-													// (G.positions[idx][0] + 1)/2,
-													// (G.positions[idx][1] + 1)/2,
-													// (G.positions[idx+1][0] + 1)/2,
-													// (G.positions[idx+1][1] + 1)/2,
-													// (G.positions[idx+n][0] + 1)/2,
-													// (G.positions[idx+n][1] + 1)/2,
-													// (G.positions[idx+n+1][0] + 1)/2,
-													// (G.positions[idx+n+1][1] + 1)/2
-												);
+				G.texCoords.push( [i/(n-1)*n, j/(n-1)*n]);
 			}
 		}
-
-		console.log(G.texCoords);
 
 		return G;
 	}
 
 	grid = Grid(n);
-	grid.diffuseMap = "Textures/brick2.jpg";
-	// grid.normalMap = "moss-normal.jpg";
+	grid.diffuseMap = "Textures/brick-normal.jpg";
+	grid.normalMap = "moss-normal.jpg";
 	objInit(grid);
-	console.log(grid);	
+	console.log(grid);
 
 	var m = mult(scalem(10,10,10),rotateX(90));
 	m = mult(translate(0,-0.5,0), m);
@@ -166,7 +153,7 @@ function render(now){
 	gl.uniform3fv(Locations.cameraPosition, flatten(cameraPosition));
 
 	obj1.setModelMatrix(mult(translate(cameraPosition), rotateX(90)));
-  gl.uniform1f(Locations.cube, 1.0);
+	gl.uniform1f(Locations.cube, 1.0);
 	obj1.draw();
 	gl.uniform1f(Locations.cube, 0.0);
 
