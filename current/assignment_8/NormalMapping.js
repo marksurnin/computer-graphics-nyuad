@@ -64,7 +64,7 @@ window.onload = function init() {
 	// set up scene	
 
 	obj1 = Cube();
-	obj1.diffuseMap = "cubemap.jpg";
+	obj1.diffuseMap = "cube.jpg";
 	objInit(obj1);
 	obj1.setModelMatrix(rotateX(90));
 
@@ -173,7 +173,7 @@ window.onload = function init() {
 	var m = mult(scalem(100,100,100),rotateX(90));
 	m = mult(translate(0,0,0), m);
 	grid.setModelMatrix(m);
-
+	teapot.diffuseMap = "cube.jpg";
 	objInit(teapot);
 	var m = mult(scalem(0.003,0.003,0.003),rotateX(0));
 	m = mult(translate(0,-0.2,-1), m);
