@@ -219,7 +219,7 @@ void main(){
 		vec4 computedColor = computeColor(fPosition, normal);
 
 		if (teapot == 1.0) {
-			gl_FragColor = (computedColor + reflectedColor)/2.0;
+			gl_FragColor = (0.3 * computedColor + 0.7 * reflectedColor);
 		} else {
 			gl_FragColor = computedColor;
 		}

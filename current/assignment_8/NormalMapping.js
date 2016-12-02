@@ -174,6 +174,12 @@ window.onload = function init() {
 	m = mult(translate(0,0,0), m);
 	grid.setModelMatrix(m);
 	teapot.diffuseMap = "cubemap.jpg";
+	teapot.material = {
+			Ka: vec3(0.6, 0.1, 0.5),
+			Kd: vec3(0.7, 0.1, 0.6),
+			Ks: vec3(0.8, 0.7, 0.8),
+			shininess: 500
+		};
 	objInit(teapot);
 	var m = mult(scalem(0.003,0.003,0.003),rotateX(0));
 	m = mult(translate(0,-0.2,-1), m);
@@ -346,7 +352,7 @@ function Square(){
 
 function Cube(){
 // create sphere with texture coordinates
-	var l = 10;
+	var l = 5;
 	var a = vec3(-l,-l,-l);
 	var b = vec3( l,-l,-l);
 	var c = vec3( l, l,-l);
@@ -391,9 +397,9 @@ function Cube(){
 		            			 // [3,2,6], [3,6,7], // back
 		            			 // [4,5,1], [4,1,0]	// front
 		 	  	material: {	
-							Ka: vec3(0.2, 0.2, 0.2),
-							Kd: vec3(0.0, 1.0, 0.5),
-							Ks: vec3(0.0, 0.0, 0.0),
+							Ka: vec3(0.9, 0.6, 0.7),
+							Kd: vec3(0.7, 1.0, 0.5),
+							Ks: vec3(0.9, 0.9, 0.9),
 		 	  				shininess: 10
 		 	  	}
 	};
