@@ -229,7 +229,7 @@ function render(now){
 	// gl.uniformMatrix4fv(Locations.)
 
 	gl.uniform1f(Locations.teapot, 1.0);
-	gl.depthMask(false);
+	// gl.depthMask(false);
 	teapot.draw();
 	gl.uniform1f(Locations.teapot, 0.0);
 	// gl.depthMask(true);
@@ -346,7 +346,7 @@ function Square(){
 
 function Cube(){
 // create sphere with texture coordinates
-	var l = 1;
+	var l = 10;
 	var a = vec3(-l,-l,-l);
 	var b = vec3( l,-l,-l);
 	var c = vec3( l, l,-l);
