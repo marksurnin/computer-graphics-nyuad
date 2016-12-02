@@ -132,7 +132,7 @@ vec4 computeColor(vec3 position, vec3 normal) {
 }
 
 //Takes reflection vector of magnitude 1 and returns texture coordinate projection in 2D
-vec2 computeTexture(vec3 reflection) {
+vec2 computeTexture(vec4 reflection) {
 	float x = reflection.x;
 	float y = reflection.y;
 	float z = reflection.z;
@@ -142,6 +142,8 @@ vec2 computeTexture(vec3 reflection) {
 	float absy = abs(y);
 	float absz = abs(z);
 	if (absx >= absy && absx >= absz ) {
+		y /= abs(x);
+		z /= abs(x);
 		if (x >= 0.0) {
 			texCoord = vec2(5.0/8.0 + z/8.0, 1.0/2.0 + y/6.0);
 		}
@@ -150,6 +152,8 @@ vec2 computeTexture(vec3 reflection) {
 		}
 	}
 	else if (absy >= absx && absy >= absz ) {
+		z /= abs(y);
+		x /= abs(y);
 		if (y >= 0.0) {
 			texCoord = vec2(3.0/8.0 + x/8.0, 5.0/6.0 + z/6.0);
 		}
@@ -158,7 +162,9 @@ vec2 computeTexture(vec3 reflection) {
 		}
 	}
 	else if (absz >= absx && absz >= absy ) {
-		if (z >= 0.0) {
+		x /= abs(z);
+		y /= abs(z);
+		if (z <= 0.0) {
 			texCoord = vec2(7.0/8.0 - x/8.0, 1.0/2.0 + y/6.0);
 		}
 		else {
@@ -176,7 +182,12 @@ void main(){
 	} else if (teapot == 1.0) {
 		// vec3 N = normalize()
 		// gl_FragColor = vec4( 1.0, 0.5, 0.45, 1.0 );
-		gl_FragColor = texture2D(diffuseMapSampler, computeTexture(normalize(R)));
+		vec4 RR;
+		RR.x = R.x;
+		RR.y = R.y;
+		RR.z = R.z;
+		vec4 reflection = VP*RR;
+		gl_FragColor = texture2D(diffuseMapSampler, computeTexture(normalize(reflection)));
 		// vec4 texColor = textureCube(texMap, R);
 		// gl_FragColor = texColor;
 	} else	{
