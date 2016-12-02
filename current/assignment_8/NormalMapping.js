@@ -30,7 +30,7 @@ window.onload = function init() {
 
 	// Get Locations of attributes and Locations
 	var Attributes = [];
-	var Uniforms = ["VP", "TB", "TBN", "cameraPosition", "cameraProjection", "Ia", "Id", "Is", "lightPosition", "cube", "terrain", "teapot"];
+	var Uniforms = ["VP", "VIP", "TB", "TBN", "cameraPosition", "cameraProjection", "Ia", "Id", "Is", "lightPosition", "cube", "terrain", "teapot"];
 
 	Locations = getLocations(Attributes, Uniforms); // defined in Utils.js
  
@@ -196,6 +196,9 @@ function render(now){
 	
 	var VP = camera.getMatrix(); 
 	gl.uniformMatrix4fv(Locations.VP, gl.FALSE, flatten(VP));	
+
+	var VIP = inverse(VP);
+	gl.uniformMatrix4fv(Locations.VIP, gl.FALSE, flatten(VIP));	
 
 	var cameraProjection = camera.getProjectionMatrix();
 	gl.uniformMatrix4fv(Locations.cameraProjection, gl.FALSE, flatten(cameraProjection));
