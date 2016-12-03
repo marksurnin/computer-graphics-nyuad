@@ -1,14 +1,11 @@
 "use strict";
 
 // global variables
-var gl, canvas, program, grid, cube, terrain, teapot;
+var gl, canvas, program, grid, cube, terrain, teapot, cubemap;
 
-var camera; 	// camera object
+var camera; 		// camera object
 var trackball; 	// virtual trackball 
-
 var Locations;  // object containing location ids of shader variables 
-
-var obj1, obj2, teapot;
 
 window.onload = function init() {
 	// Set up WebGL
@@ -60,10 +57,10 @@ window.onload = function init() {
 	gl.uniform3fv( Locations.Is, flatten(Light.Is) );
 
 	// set up scene	
-	obj1 = Cube();
-	obj1.diffuseMap = "cubemap.jpg";
-	objInit(obj1);
-	obj1.setModelMatrix(rotateX(90));
+	cubemap = Cube();
+	cubemap.diffuseMap = "cubemap.jpg";
+	objInit(cubemap);
+	cubemap.setModelMatrix(rotateX(90));
 
 	// configure the cube map for the teapot
 	var numVertices  = 36;
@@ -180,9 +177,9 @@ function render(now){
 	var cameraPosition = camera.getFrame().e;
 	gl.uniform3fv(Locations.cameraPosition, flatten(cameraPosition));
 
-	obj1.setModelMatrix(mult(translate(cameraPosition), rotateX(90)));
+	cubemap.setModelMatrix(mult(translate(cameraPosition), rotateX(90)));
 	gl.uniform1f(Locations.cube, 1.0);
-	obj1.draw();
+	cubemap.draw();
 	gl.uniform1f(Locations.cube, 0.0);
 
 	gl.uniform1f(Locations.terrain, 1.0);
