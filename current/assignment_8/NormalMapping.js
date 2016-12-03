@@ -59,88 +59,58 @@ window.onload = function init() {
 	gl.uniform3fv( Locations.Id, flatten(Light.Id) );
 	gl.uniform3fv( Locations.Is, flatten(Light.Is) );
 
-
-
 	// set up scene	
-
 	obj1 = Cube();
 	obj1.diffuseMap = "cubemap.jpg";
 	objInit(obj1);
 	obj1.setModelMatrix(rotateX(90));
 
+	// configure the cube map for the teapot
+	var numVertices  = 36;
+	var texSize = 4;
+	var numChecks = 2;
 
-	// function configureCubeMap() {
-		var numVertices  = 36;
-		var texSize = 4;
-		var numChecks = 2;
+	var flag = true;
 
-		var flag = true;
+	var red = new Uint8Array([255, 0, 0, 255]);
+	var green = new Uint8Array([0, 255, 0, 255]);
+	var blue = new Uint8Array([0, 0, 255, 255]);
+	var cyan = new Uint8Array([0, 255, 255, 255]);
+	var magenta = new Uint8Array([255, 0, 255, 255]);
+	var yellow = new Uint8Array([255, 255, 0, 255]);
 
-		var red = new Uint8Array([255, 0, 0, 255]);
-		var green = new Uint8Array([0, 255, 0, 255]);
-		var blue = new Uint8Array([0, 0, 255, 255]);
-		var cyan = new Uint8Array([0, 255, 255, 255]);
-		var magenta = new Uint8Array([255, 0, 255, 255]);
-		var yellow = new Uint8Array([255, 255, 0, 255]);
-
-		var cubeMap = gl.createTexture();
-
-
-		gl.activeTexture( gl.TEXTURE3 );
-		gl.uniform1i(gl.getUniformLocation(program, "texMap"), 3);
-	    gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMap);
-
-	    gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X ,0,gl.RGBA,
-	       1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, red);
-	    gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X ,0,gl.RGBA,
-	       1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, green);
-	    gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y ,0,gl.RGBA,
-	       1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, blue);
-	    gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y ,0,gl.RGBA,
-	       1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, cyan);
-	    gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z ,0,gl.RGBA,
-	       1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, yellow);
-	    gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z ,0,gl.RGBA,
-	       1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, magenta);
+	var cubeMap = gl.createTexture();
 
 
-	    gl.texParameteri(gl.TEXTURE_CUBE_MAP,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
-	    gl.texParameteri(gl.TEXTURE_CUBE_MAP,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
-	// }
-	// configureCubeMap();
+	gl.activeTexture( gl.TEXTURE3 );
+	gl.uniform1i(gl.getUniformLocation(program, "texMap"), 3);
+  gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMap);
 
+  gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X , 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, red);
+  gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X , 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, green);
+  gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y , 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, blue);
+  gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y , 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, cyan);
+  gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z , 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, yellow);
+  gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z , 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, magenta);
 
-
-	// obj2 = Square();
-	// obj2.diffuseMap = "Textures/moss-diffuse.jpg";
-	// obj2.normalMap = "Textures/moss-normal.jpg";
-	// objInit(obj2);
-	// var m = mult(scalem(30,30,30),rotateX(90));
-	// m = mult(translate(0,-1.0,0), m);
-	// obj2.setModelMatrix(m);
-
-
+  gl.texParameteri(gl.TEXTURE_CUBE_MAP,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_CUBE_MAP,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
 
 	// Grid code from previous assignment
+	// n ( >=2 ) is the number of vertices in a row or column.
+	// The function returns an n x n grid.
 	function Grid(n){
-		// n ( >=2 ) is the number of vertices in a row or column.
-		// The function returns an n x n grid.
-
 		var i,j, idx;
-
 		var G = {
 			positions: [],
 			triangles: [],
 			texCoords: []
 		};
 
-
 		for(i=0; i<n; ++i){
 			for(j=0; j<n; ++j){
 				var rawHeight = gridHeights[n*i+j][2];
-				// console.log(rawHeight/1000);
 				G.positions.push( [-1+2*i/(n-1), -1+2*j/(n-1), rawHeight/2000 - 0.12] );
-				// console.log(gridHeights[n*i+j][2]);
 			}
 		}
 
@@ -161,36 +131,34 @@ window.onload = function init() {
 		return G;
 	}
 
+	// set up the grid
 	var n = 255;
 	grid = Grid(n);
 	grid.diffuseMap = "moss-diffuse.jpg";
 	grid.normalMap = "moss-normal.jpg";
 	grid.heightMap = "heightmap.jpg";
-
 	objInit(grid);
-	console.log(grid);
-
 	var m = mult(scalem(100,100,100),rotateX(90));
 	m = mult(translate(0,0,0), m);
 	grid.setModelMatrix(m);
+
+	// set up the teapot
 	teapot.diffuseMap = "cubemap.jpg";
 	teapot.material = {
-			Ka: vec3(0.6, 0.1, 0.5),
-			Kd: vec3(0.7, 0.1, 0.6),
-			Ks: vec3(0.8, 0.7, 0.8),
-			shininess: 500
-		};
+		Ka: vec3(0.6, 0.1, 0.5),
+		Kd: vec3(0.7, 0.1, 0.6),
+		Ks: vec3(0.8, 0.7, 0.8),
+		shininess: 500
+	};
 	objInit(teapot);
 	var m = mult(scalem(0.003,0.003,0.003),rotateX(0));
 	m = mult(translate(0,-0.2,-1), m);
 	teapot.setModelMatrix(m);
 
 	requestAnimationFrame(render);
-
 };
 
 function render(now){
-	
 	requestAnimationFrame(render);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -223,38 +191,31 @@ function render(now){
 	gl.uniform1f(Locations.terrain, 0.0);
 	gl.depthMask(true);
 
-	// TB = mat4();
-	// gl.uniformMatrix4fv(Locations.TB, gl.FALSE, flatten(TB));
-
-	// TBN = mat3();
-	// gl.uniformMatrix3fv(Locations.TBN, gl.FALSE, flatten(TBN));
-
-	// obj2.draw();
-
 	var normalMatrix = teapot.getModelMatrix();
-	// gl.uniformMatrix4fv(Locations.)
 
 	gl.uniform1f(Locations.teapot, 1.0);
+	// if the depth mask is disabled, the teapot becomes transparent as the depth buffer is overwritten
 	// gl.depthMask(false);
 	teapot.draw();
 	gl.uniform1f(Locations.teapot, 0.0);
-	// gl.depthMask(true);
 }
 
 //-------------------------- CREATE SPHERE ----------------------------------- 
 // create sphere with texture coordinates
 function Sphere(){
 
-	var S = { 	positions: [],
-				normals: [],
-				texCoords: [],
-				triangles: [],
-				material: {	Ka: vec3(0.1, 0.1, 0.1),
-							Kd: vec3(0.7, 0.1, 0.6),
-							Ks: vec3(0.1, 0.1, 0.1),
-							shininess: 1
-				},
-			};
+	var S = {
+		positions: [],
+		normals: [],
+		texCoords: [],
+		triangles: [],
+		material: {
+			Ka: vec3(0.1, 0.1, 0.1),
+			Kd: vec3(0.7, 0.1, 0.6),
+			Ks: vec3(0.1, 0.1, 0.1),
+			shininess: 1
+		}
+	};
 
 	var N = 100; // # latitudes (excluding poles) = N, # longitudes = 2*N+3
 	var i, j;
@@ -332,16 +293,17 @@ function Square(){
 	var tc = vec2(1,1);
 	var td = vec2(0,1);
 
-	var S = {	positions: [a,b,c,d],
-		 	  	normals:   [n,n,n,n], 
-		 	  	texCoords: [ta,tb,tc,td],
-		 	  	triangles: [[0,1,2],[0,2,3]],
-		 	  	material: {	
-							Ka: vec3(0.2, 0.2, 0.2),
-							Kd: vec3(0.0, 1.0, 0.5),
-							Ks: vec3(0.0, 0.0, 0.0),
-		 	  				shininess: 10
-		 	  	}
+	var S = {
+		positions: [a,b,c,d],
+  	normals:   [n,n,n,n], 
+  	texCoords: [ta,tb,tc,td],
+  	triangles: [[0,1,2],[0,2,3]],
+  	material: {	
+			Ka: vec3(0.2, 0.2, 0.2),
+			Kd: vec3(0.0, 1.0, 0.5),
+			Ks: vec3(0.0, 0.0, 0.0),
+			shininess: 10
+  	}
 	};
 
 	return S;
@@ -374,36 +336,31 @@ function Cube(){
 	var tc = vec2(1,1);
 	var td = vec2(0,1);
 
-	var S = {	positions: [a,a,a,b,b,b,c,c,c,d,d,d,e,e,e,f,f,f,g,g,g,h,h,h],
-		 	  	
-		 	  	texCoords: [  vec2(0.25, 0.00),  vec2(0.00, 0.33),  vec2(1.00, 0.33),  vec2(0.50, 0.00),
-		 	  								vec2(0.75, 0.33),  vec2(0.75, 0.33),  vec2(0.50, 0.33),  vec2(0.50, 0.33),
-		 	  								vec2(0.50, 0.33),  vec2(0.25, 0.33),  vec2(0.25, 0.33),  vec2(0.25, 0.33),
-		 	  								vec2(0.25, 1.00),  vec2(0.00, 0.66),  vec2(1.00, 0.66),  vec2(0.50, 1.00),
-		 	  								vec2(0.75, 0.66),  vec2(0.75, 0.66),  vec2(0.50, 0.66),  vec2(0.50, 0.66),
-		 	  								vec2(0.50, 0.66),  vec2(0.25, 0.66),  vec2(0.25, 0.66),  vec2(0.25, 0.66)], 
-		 	  	triangles: [ [ 0, 3, 6], [ 0, 6, 9],	// bottom
-		 	  							 [18,15,12], [12,21,18],	// top
-		                   [13, 1,10], [13,10,22],	// left
-		                   [ 4,16,19], [ 4,19, 7],	// right
-		                   [11, 8,20], [11,20,23], 	// back
-		                   [14,17, 5], [14, 5, 2]],	// front
-
-		                   // Old vertices
-		 	  							 // [0,1,2], [0,2,3], // bottom
-		 	  							 // [6,5,4], [4,7,6], // top
-		            			 // [4,0,3], [4,3,7], // left
-		            			 // [1,5,6], [1,6,2], // right
-		            			 // [3,2,6], [3,6,7], // back
-		            			 // [4,5,1], [4,1,0]	// front
-		 	  	material: {	
-							Ka: vec3(0.9, 0.6, 0.7),
-							Kd: vec3(0.7, 1.0, 0.5),
-							Ks: vec3(0.9, 0.9, 0.9),
-		 	  				shininess: 10
-		 	  	}
+	var S = {
+		positions: [a,a,a,b,b,b,c,c,c,d,d,d,e,e,e,f,f,f,g,g,g,h,h,h],
+  	texCoords: [
+  		vec2(0.25, 0.00),  vec2(0.00, 0.33),  vec2(1.00, 0.33),  vec2(0.50, 0.00),
+			vec2(0.75, 0.33),  vec2(0.75, 0.33),  vec2(0.50, 0.33),  vec2(0.50, 0.33),
+			vec2(0.50, 0.33),  vec2(0.25, 0.33),  vec2(0.25, 0.33),  vec2(0.25, 0.33),
+			vec2(0.25, 1.00),  vec2(0.00, 0.66),  vec2(1.00, 0.66),  vec2(0.50, 1.00),
+			vec2(0.75, 0.66),  vec2(0.75, 0.66),  vec2(0.50, 0.66),  vec2(0.50, 0.66),
+			vec2(0.50, 0.66),  vec2(0.25, 0.66),  vec2(0.25, 0.66),  vec2(0.25, 0.66)
+		], 
+  	triangles: [
+  		[ 0, 3, 6], [ 0, 6, 9],	// bottom
+			[18,15,12], [12,21,18],	// top
+			[13, 1,10], [13,10,22],	// left
+			[ 4,16,19], [ 4,19, 7],	// right
+			[11, 8,20], [11,20,23], // back
+			[14,17, 5], [14, 5, 2]	// front
+		],
+  	material: {	
+			Ka: vec3(0.9, 0.6, 0.7),
+			Kd: vec3(0.7, 1.0, 0.5),
+			Ks: vec3(0.9, 0.9, 0.9),
+  		shininess: 10
+  	}
 	};
-
 	return S;
 }
 
