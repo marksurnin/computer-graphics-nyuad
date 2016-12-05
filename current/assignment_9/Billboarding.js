@@ -6,7 +6,7 @@ var gl, canvas, program, grid, cube, terrain, teapot, cubemap, treelist = [];;
 var camera; 		// camera object
 var trackball; 	// virtual trackball 
 var Locations;  // object containing location ids of shader variables 
-
+var e, preve = 0, moved;
 window.onload = function init() {
 	// Set up WebGL
 	canvas = document.getElementById("gl-canvas");
@@ -152,7 +152,8 @@ window.onload = function init() {
 	m = mult(translate(0,-0.2,-1), m);
 	teapot.setModelMatrix(m);
 
-	var ntree = 40;
+	// Set up trees. They will have random positions and random species.
+	var ntree = 10;
 	var treeTexture = ["tree1.jpg", "tree2.jpg"];
 	var e = camera.getFrame().e;
 	for (var i = 0; i < ntree; i++) {
@@ -168,7 +169,6 @@ window.onload = function init() {
 		tree.setModelMatrix(m);
 		treelist.push(tree);
 	}
-	console.log(treelist);
 
 
 
@@ -208,12 +208,28 @@ function render(now){
 	gl.uniform1f(Locations.terrain, 0.0);
 	gl.depthMask(true);
 
+	// Check if camera moved
+	e = camera.getFrame().e;
+	if (e != preve) {
+		moved = true;
+		preve = e;
+	}
+	else {
+		moved = false;
+	}
+
 	// Draw trees
-	var at = camera.getFrame().e;
 	gl.uniform1f(Locations.tree, 1.0);
 	for (var i = treelist.length - 1; i >= 0; i--) {
 		var tree = treelist[i];
-		tree.updateDirection.bind(tree, at);
+		if (moved){ //if camera moved, update tree positions to face camera
+			var args = tree.getFrame();
+			var at = subtract(e, args[0]);
+			var tempTree = Billboard(args[0], args[1], at, args[3]);
+			tree.positions = tempTree.positions;
+			tree.normals = tempTree.normals;
+			objInit(tree); //setup buffers again
+		}
 		tree.draw();
 	}
 	gl.uniform1f(Locations.tree, 0.0);
@@ -229,27 +245,27 @@ function render(now){
 }
 
 // create Billboard with texture coordinates
-// o is a vec3 position of one coordinate
+// o is a vec3 position of the location of the root.
 // up is the up direction, at is facing direction
 // sz is the size of the Billboard
 // for billboarding, the "at" vector should be processed as being parallel to ground.
 function Billboard(o, up, at, sz){
+	var args = arguments;
 	var a = vec3(-1,-1,0);
 	var b = vec3(1,-1,0);
 	var c = vec3(1,1,0);
 	var d = vec3(-1,1,0);
 	var n = vec3(0,0,1);
 	var size = !!sz ? sz : 1;
-	console.log(size);
 	if (!!o && !!up & !!at) {
 		up = normalize(up);
 		at = scale(size, normalize(at));
-		var side = cross(up, at);
+		var side = scale(0.5, cross(up, at));
 		up = scale(size, up);
-		a = o;
+		a = subtract(o, side);
 		b = add(o, side);
 		c = add(b, up);
-		d = add(o, up);
+		d = add(a, up);
 		n = at;
 	}
 
@@ -269,25 +285,8 @@ function Billboard(o, up, at, sz){
 			Ks: vec3(0.0, 0.0, 0.0),
 			shininess: 10
 		},
-		updateDirection: function(at) {
-			console.log("hi");
-			console.log(S.positions);
-			var up = normalize(subtract(S.positions[3], S.positions[0]));
-			var o = S.positions[0];
-			var at = subtract(at, o);
-			var size = length(subtract(S.positions[3], S.positions[0]));
-			at = scale(size, normalize(at));
-			var side = cross(up, at);
-			up = scale(size, up);
-
-			var a = o;
-			var b = add(o, side);
-			var c = add(b, up);
-			var d = add(o, up);
-			var n = at;
-			S.positions = [a,b,c,d];
-			S.normals = [n,n,n,n];
-			console.log(S.positions);
+		getFrame : function(){
+			return args;
 		}
 	};
 	return S;
