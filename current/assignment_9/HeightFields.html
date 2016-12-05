@@ -49,37 +49,73 @@ struct Camera {
 
 struct hitObject {
   Sphere obj;
-  vec3 loc;
+  vec3 point;
   float t;
 };
 
-// varying Sphere objects[2];
+struct Light {
+  vec3 position;   //camera position
+  float intensity;
+  vec3 color;   //view target
+};
+
+struct Material {
+  vec3 color;   //camera position
+  float reflectivity;
+  float shininess;   //view target
+};
+
+Sphere objects[2];
+Light lights[2];
+Material materials[2];
+vec3 ambient_light = vec3(0.1,0.1,0.1);
+vec3 background_color = vec3(0,0,0);
 
 Camera camera = Camera(vec3(0.0, 0.0, 3.6), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 0.0), 60.0);   //view target
 
-// hitObject hit(Ray ray) {
-//   float x, t;
-//   //var obj = null,
-//   vec3 loc;
-//   int i;
-//   // int len;
-//   // len = objects.length();
-//   for (i = 0; i < 2; i++){
-//     x = intersect(ray, objects[i]);
-//     if(x >= 0.0 && x < t){
-//       Sphere obj = Sphere(objects[i].center, objects[i].radius, objects[1].material_id);
-//       obj = objects[i];
-//       t = x;
-//     }
-//   }
-//   if(t < 9999999.99){
-//     loc = ray.o + t*ray.d;
-//   }
+float intersect(Ray ray, Sphere sphere) {
+  float t, t1, t2;
+  vec3 x = ray.o - sphere.center;
+  float A = dot(ray.d, ray.d);
+  float B = 2.0 * dot(x, ray.d);
+  float C = dot(x,x) - sphere.radius * sphere.radius;
+  float D = B*B - 4.0*A*C;
+  t = 99999.99;
+  if (D >= 0.0){
+    float S = sqrt(D);
+    t1 = (-B - S)/(2.0 * A);
+    t2 = (-B + S)/(2.0 * A);
+    if (t1 >= 0.0){
+      t = t1;
+    }
+    if (t2 >= 0.0 && t2 < t1 ){
+      t = t2;
+    }
+  }
+  return t;
+}
 
-//   hitObject theSphere = hitObject(Sphere obj, vec3 loc, float t);
+hitObject hit(Ray ray) {
+  float x, t;
+  Sphere obj;
+  vec3 point;
+  int i;
+  for (i = 0; i < 2; i++){
+    x = intersect(ray, objects[i]);
+    if (x >= 0.0 && x < t) {
+      obj = objects[i];
+      t = x;
+    }
+  }
 
-//   return hitObject;
-// }
+  if(t < 9999999.99){
+    point = ray.o + t*ray.d;
+  }
+
+  hitObject theSphere = hitObject(obj, point, t);
+
+  return theSphere;
+}
 
 Ray pixelRay(float x, float y) {
   // invert y
@@ -111,40 +147,78 @@ Ray pixelRay(float x, float y) {
   return theRay;
 }
 
-float intersect(Ray ray, Sphere sphere) {
-  float t, t1, t2;
-  vec3 x = ray.o - sphere.center;
-  float A = dot(ray.d, ray.d);
-  float B = 2.0 * dot(x, ray.d);
-  float C = dot(x,x) - sphere.radius * sphere.radius;
-  float D = B*B - 4.0*A*C;
-  t = 99999.99;
-  if (D >= 0.0){
-    float S = sqrt(D);
-    t1 = (-B - S)/(2.0 * A);
-    t2 = (-B + S)/(2.0 * A);
-    if (t1 >= 0.0){
-      t = t1;
-    }
-    if (t2 >= 0.0 && t2 < t1 ){
-      t = t2;
+vec3 shade(vec3 position, vec3 normal, vec3 viewDir/*, int material*/) {
+  Light l;
+  vec3 toLight, lightDir;
+  vec3 halfvector;
+  float diffuseIntensity, specularIntensity;
+  // float shininess = material.shininess;
+  float shininess = 100.0;
+  // vec3 color = material.color;
+  vec3 color = vec3(1.0, 1.0, 0.0);
+
+  vec3 final_color, diffuse, specular;
+  diffuse = ambient_light;
+  final_color = vec3(0,0,0);
+  specular = vec3(0,0,0);
+
+  int i;
+  for (i = 0; i < 2; i++) {
+    l = lights[i];
+    toLight = l.position - position;
+    lightDir = normalize(toLight);
+
+    Ray shadowRay = Ray(position, lightDir);
+
+    if (hit(shadowRay).t > length(toLight)) {
+      diffuseIntensity = l.intensity * max(dot(lightDir, normal), 0.0);
+      diffuse = diffuse + diffuseIntensity * l.color;
+      halfvector = normalize(viewDir + lightDir);
+      specularIntensity = pow(max(dot(halfvector, normal), 0.0), shininess);
+      specular = specular + specularIntensity * l.color;
     }
   }
-  return t;
+
+  final_color = final_color + diffuse * color;
+  final_color = final_color + specular;
+
+  return final_color;
 }
 
-float sinc(float x){
-    if(x==0.0) return 1.0;
-    return sin(x)/x;
+vec3 computeTheNormal(vec3 center, vec3 point) {
+  return normalize(point - center);
+}
+
+vec3 trace(Ray ray, float depth) {
+  hitObject h;
+  vec3 color = background_color;
+  h = hit(ray);
+  if (h.obj.radius > 0.0) {
+    vec3 boo;
+    vec3 normal = computeTheNormal(h.obj.center, h.point);
+    Material material = materials[h.obj.material_id];
+    vec3 viewDir = -1.0 * ray.d;
+    color = shade(h.point, normal, viewDir /*, material*/);
+
+    if (depth == 0.0) {
+      return color;
+    }
+
+    vec3 reflected_dir = ray.d + (-2.0 * dot(ray.d, normal) * normal);
+    Ray reflected_ray = Ray(h.point, reflected_dir);
+    // vec3 reflected_col = trace(reflected_ray, depth - 1.0);
+    // color = color + material.reflectivity * reflected_col;
+  }
+  return vec3(1.0,1.0,1.0);
 }
 
 float sumOfSines(float x, float y){
-	float s = 0.0;
-	s += 0.3*sin(4.0*x + 2.0*y);
-	s+= -0.3*sin(6.0*x + 0.6*y);
-	s+= -0.2*sin(4.0*y - 3.1*x);
-	s+= 0.1*sin(8.0*x - 5.0*y);
-	return 0.1*s;
+  float s = 0.0;
+  s += 0.3*sin(4.0*x + 2.0*y);
+  s+= -0.3*sin(6.0*x + 0.6*y);
+  s+= -0.2*sin(4.0*y - 3.1*x);
+  s+= 0.1*sin(8.0*x - 5.0*y);
+  return 0.1*s;
 }
 
 float f(float x, float y){
@@ -154,12 +228,16 @@ float f(float x, float y){
     return sumOfSines(x,y);
 }
 
-
 vec3 computeNormal(float x, float y){
-	float delta = 0.01;
-	float dfdx = (f(x+delta, y) - f(x,y))/delta;
-	float dfdy = (f(x, y+delta) - f(x,y))/delta;
-	return vec3(-dfdx,-dfdy, 1.0);
+  float delta = 0.01;
+  float dfdx = (f(x+delta, y) - f(x,y))/delta;
+  float dfdy = (f(x, y+delta) - f(x,y))/delta;
+  return vec3(-dfdx,-dfdy, 1.0);
+}
+
+float sinc(float x){
+    if(x==0.0) return 1.0;
+    return sin(x)/x;
 }
 
 void main(){
@@ -168,7 +246,7 @@ void main(){
   Sphere sphere1 = Sphere(vec3(-0.6,0.6,1.5), 0.2, 0);
 
   // Remember to put spheres into the objects array
-  // objects[0] = sphere1;
+  objects[0] = sphere1;
   // objects[1] = sphere1;
 
 	vec4 v = vPosition;
