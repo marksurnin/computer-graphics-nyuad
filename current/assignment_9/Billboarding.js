@@ -58,7 +58,7 @@ window.onload = function init() {
 
 	// set up scene	
 	cubemap = Cube();
-	cubemap.diffuseMap = "cubemap.jpg";
+	cubemap.diffuseMap = "Textures/cubemap.jpg";
 	objInit(cubemap);
 	cubemap.setModelMatrix(rotateX(90));
 
@@ -131,16 +131,16 @@ window.onload = function init() {
 	// set up the grid
 	var n = 255;
 	grid = Grid(n);
-	grid.diffuseMap = "moss-diffuse.jpg";
-	grid.normalMap = "moss-normal.jpg";
-	grid.heightMap = "heightmap.jpg";
+	grid.diffuseMap = "Textures/moss-diffuse.jpg";
+	grid.normalMap = "Textures/moss-normal.jpg";
+	grid.heightMap = "Textures/heightmap.jpg";
 	objInit(grid);
 	var m = mult(scalem(100,100,100),rotateX(90));
 	m = mult(translate(0,0,0), m);
 	grid.setModelMatrix(m);
 
 	// set up the teapot
-	teapot.diffuseMap = "cubemap.jpg";
+	teapot.diffuseMap = "Textures/cubemap.jpg";
 	teapot.material = {
 		Ka: vec3(0.6, 0.1, 0.5),
 		Kd: vec3(0.7, 0.1, 0.6),
@@ -153,8 +153,8 @@ window.onload = function init() {
 	teapot.setModelMatrix(m);
 
 	// Set up trees. They will have random positions and random species.
-	var ntree = 10;
-	var treeTexture = ["tree1.jpg", "tree2.jpg"];
+	var ntree = 15;
+	var treeTexture = ["Textures/tree1.jpg", "Textures/tree2.jpg"];
 	var e = camera.getFrame().e;
 	for (var i = 0; i < ntree; i++) {
 		var o = vec3(2*Math.random()-1, 0, 2*Math.random()-1);
