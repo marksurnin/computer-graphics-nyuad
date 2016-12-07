@@ -30,7 +30,7 @@ window.onload = function init() {
 
 	// Get Locations of attributes and Locations
 	var Attributes = [];
-	var Uniforms = ["VP", "TB", "TBN", "cameraPosition", "Ia", "Id", "Is", "lightPosition"];
+	var Uniforms = ["VP", "TB", "TBN", "cameraPosition", "Ia", "Id", "Is", "lightPosition", "id"];
 
 	Locations = getLocations(Attributes, Uniforms); // defined in Utils.js
  
@@ -71,7 +71,6 @@ window.onload = function init() {
 
 	pear_tail.diffuseMap = "Textures/pear_diffuse.jpg";
 	pear_tail.normalMap = "Textures/pear_normal_map.jpg";
-	pear_tail.specularMap = "Textures/pear_specular.jpg";
 	objInit(pear_tail);
 
 	pear_skin.diffuseMap = "Textures/pear_diffuse.jpg";
@@ -81,16 +80,7 @@ window.onload = function init() {
 	
 	pear_flower.diffuseMap = "Textures/pear_diffuse.jpg";
 	pear_flower.normalMap = "Textures/pear_normal_map.jpg";
-	pear_flower.specularMap = "Textures/pear_specular.jpg";
 	objInit(pear_flower);
-
-	obj2 = Square();
-	obj2.diffuseMap = "Textures/brick-diffuse.jpg";
-	obj2.normalMap = "Textures/brick-normal.jpg";
-	objInit(obj2);
-	var m = mult(scalem(2,2,2),rotateX(90));
-	m = mult(translate(0,-1,0), m);
-	obj2.setModelMatrix(m);
 
 	requestAnimationFrame(render);
 
@@ -113,9 +103,11 @@ function render(now){
 	var cameraPosition = camera.getFrame().e;
 	gl.uniform3fv(Locations.cameraPosition, flatten(cameraPosition));
 
-	// obj1.draw();
+	gl.uniform1f(Locations.id, 0.0);
 	pear_tail.draw();
+	gl.uniform1f(Locations.id, 1.0);
 	pear_skin.draw();
+	gl.uniform1f(Locations.id, 2.0);
 	pear_flower.draw();
 
 	TB = mat4();
@@ -123,8 +115,6 @@ function render(now){
 
 	TBN = mat3();
 	gl.uniformMatrix3fv(Locations.TBN, gl.FALSE, flatten(TBN));
-
-	obj2.draw();
 }
 
 //-------------------------- CREATE SPHERE ----------------------------------- 
