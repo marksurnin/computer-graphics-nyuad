@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"> 
 
-<title>Load Model</title>
+<title>Ray Tracing in GPU</title>
 
 <script type="text/javascript" src="../../common/webgl-utils.js"></script>
 <script type="text/javascript" src="../../common/initShaders.js"></script>
@@ -12,7 +12,7 @@
 <script type="text/javascript" src="../../common/Object.js"></script>
 <script type="text/javascript" src="../../common/Utils.js"></script>
 
-<script type="text/javascript" src="HeightFields.js"></script> 
+<script type="text/javascript" src="RayTracingGPU.js"></script> 
 
 <script id="vertex-shader" type="x-shader/x-vertex">
 precision highp float;
@@ -65,7 +65,7 @@ void main() {
 
 	vec3 n = computeNormal(v.x, v.y);
 
-	vec4 wPos = TB*M*v; // world position
+	vec4 wPos = TB*M*vPosition; // world position
 	
 	v = VP*wPos;   
 	v.z = -v.z;  // compensate for left handed coordinate system used by WebGL
@@ -88,6 +88,7 @@ uniform float shininess;
 varying vec4 fColor, v;
 varying vec3 fPosition, fNormal;
 const int trace_depth = 2;
+
 
 struct Ray {
   vec3 o; //origin
@@ -128,21 +129,26 @@ struct Material {
 Sphere objects[2];
 Light lights[2];
 Material materials[2];
-vec3 ambient_light = vec3(0.7,0.7,0.7);
+vec3 ambient_light = vec3(0.5,0.5,0.5);
 vec3 background_color = vec3(0.0,0.0,0.0);
+Camera camera;
 
-Camera camera = Camera(vec3(0.0, 0.0, 3.6), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 0.0), 60.0);   //view target
-
+/**
+ * [intersect description]
+ * @param  {[type]} Ray    ray           [description]
+ * @param  {[type]} Sphere sphere        [description]
+ * @return {[type]}        [description]
+ */
 float intersect(Ray ray, Sphere sphere) {
-  float t, t1, t2;
-  vec3 x = ray.o - sphere.center;
-  float A = dot(ray.d, ray.d);
-  float B = 2.0 * dot(x, ray.d);
+  float t, t1, t2; //
+  vec3 x = ray.o - sphere.center; // vec from sphere center to ray origin
+  float A = dot(ray.d, ray.d); //size^2
+  float B = 2.0 * dot(x, ray.d); // 
   float C = dot(x,x) - sphere.radius * sphere.radius;
-  float D = B*B - 4.0*A*C;
+  float D = B*B - 4.0*A*C; //b^2 -4ac
   t = 99999.99;
   if (D >= 0.0){
-    float S = sqrt(D);
+    float S = sqrt(D); //sqrt(b^2-4ac)
     t1 = (-B - S)/(2.0 * A);
     t2 = (-B + S)/(2.0 * A);
     if (t1 >= 0.0){
@@ -155,8 +161,14 @@ float intersect(Ray ray, Sphere sphere) {
   return t;
 }
 
+/**
+ * Finds the closest object that the given ray hits.
+ * @param  {Ray} ray           ray with origin and direction
+ * @return {hitObject}     object that is closest to the camera
+ */
 hitObject hit(Ray ray) {
-  float x, t;
+  float x;
+  float t = 99999.99;
   Sphere obj;
   vec3 point;
 
@@ -177,6 +189,12 @@ hitObject hit(Ray ray) {
   return theSphere;
 }
 
+/**
+ * Calculated direction of ray shot from camera towards each fragment
+ * @param  {float} float x             x coordinate
+ * @param  {float} float y             y coordinate
+ * @return {Ray}       ray shot from camera towards each fragment
+ */
 Ray pixelRay(float x, float y) {
   // invert y
   y = 2.0 - y;
@@ -203,10 +221,18 @@ Ray pixelRay(float x, float y) {
   raydir = raydir + (vcomp * v);
   raydir = raydir + (wcomp * w);
 
-  Ray theRay = Ray(camera.pos, normalize(raydir));
-  return theRay;
+  Ray Saurabh = Ray(camera.pos, normalize(raydir)); //in recognition of our professor Saurabh Ray
+  return Saurabh;
 }
 
+/**
+ * Calculates what color a given fragment (on an object) is
+ * @param  {vec3}      position      position in 3D of the position where the ray hit the object
+ * @param  {vec3}      normal        normal calculated at given position
+ * @param  {vec3}      viewDir       viewing direction
+ * @param  {Material}  material      material of object at given position
+ * @return {vec3}          color of object at given position
+ */
 vec3 shade(vec3 position, vec3 normal, vec3 viewDir, Material material) {
   Light l;
   vec3 toLight, lightDir;
@@ -215,8 +241,8 @@ vec3 shade(vec3 position, vec3 normal, vec3 viewDir, Material material) {
   vec3 color = material.color;
 
   vec3 diffuse = ambient_light;
-  vec3 final_color = vec3(0,0,0);
-  vec3 specular = vec3(0,0,0);
+  vec3 final_color = vec3(1.0,0,0);
+  vec3 specular = vec3(0,1.0,0);
 
   for (int i = 0; i < 2; i++) {
     l = lights[i];
@@ -297,6 +323,7 @@ vec4 computeColor(vec3 position, vec3 normal) {
 
 void main(){
   // vec3 lightPos = vec3(1.0, 1.0, 1.0);
+  camera = Camera(vec3(0.0, 0.0, 3.6), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 0.0), 60.0);   //view target
 
   Sphere sphere0 = Sphere(vec3(-0.6,0.6,1.5), 0.2, 0);
   Sphere sphere1 = Sphere(vec3(0.0,0.0,0.0), 1.0, 1);
@@ -308,7 +335,11 @@ void main(){
   materials[0] = material0;
   materials[1] = material1;
 
-  gl_FragColor = vec4(ambient_light + trace(pixelRay(v.x, v.y)),1.0);
+  Light lights0 = Light(vec3(0.0,10.0,0.0), 5.0, vec3(1.0, 0.5,0.5));
+  Light lights1 = Light(vec3(0.0,10.0,10.0), 5.0, vec3(1.0, 0.5,0.5));
+  lights[0] = lights0;
+  lights[1] = lights1;
+  gl_FragColor = vec4(trace(pixelRay(fPosition.x, fPosition.y)),1.0);
 	// gl_FragColor = computeColor(fPosition, normalize(fNormal));
 
 }
