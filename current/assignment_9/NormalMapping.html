@@ -70,12 +70,20 @@ vec4 computeColor(vec3 position, vec3 normal) {
 	vec3 lightDir = normalize(lightPosition - position);
 	vec3 viewDir = normalize(cameraPosition - position);
 
+	float newShininess = shininess;
+
+	if (id == 1.0 && usingSpecularMap == 1) {
+		vec3 specularShininess = texture2D(specularMapSampler, fTexCoord).rgb;
+		newShininess = specularShininess.x*500.0;
+		// ks = texture2D(specularMapSampler, fTexCoord).rgb;
+	}
+
 	vec3 ambient = Ia*Ka ;
 	
 	vec3 diffuse = Id*kd* max(0.0, dot(normal, lightDir));
 	
 	vec3 halfVector = normalize(lightDir + viewDir);
-	vec3 specular = Is*ks* pow( max(dot(halfVector, normal), 0.0), shininess);
+	vec3 specular = Is*Ks* pow( max(dot(halfVector, normal), 0.0), newShininess);
 
 	vec3 color = ambient + diffuse + specular;
 
@@ -90,10 +98,6 @@ void main(){
 	}
 	else{
 		kd = Kd;
-	}
-
-	if (id == 1.0 && usingSpecularMap == 1) {
-		ks = texture2D(specularMapSampler, fTexCoord).rgb;
 	}
 
 	if(usingNormalMap == 1){

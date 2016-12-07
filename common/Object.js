@@ -4,7 +4,7 @@ function objInit(Obj){
 	var tBuffer, tanBuffer, bitanBuffer;
 	var modelMatrix = mat4();
 	var normalMatrix = mat3();
-	var diffuseMapTexture, normalMapTexture, heightMapTexture; 
+	var diffuseMapTexture, normalMapTexture, heightMapTexture, specularMapTexture; 
 	
 	var trianglesPresent = (Obj.triangles !== undefined) && (Obj.triangles.length > 0);		
 	var normalsPresent = (Obj.normals!==undefined) && (Obj.normals.length > 0);	
@@ -123,7 +123,7 @@ function objInit(Obj){
 		gl.uniform3fv(Loc.Ka, flatten(Obj.material.Ka));
 		gl.uniform3fv(Loc.Kd, flatten(Obj.material.Kd));
 		gl.uniform3fv(Loc.Ks, flatten(Obj.material.Ks));
-		gl.uniform1f(Loc.shininess, Obj.material.shininess);
+		// gl.uniform1f(Loc.shininess, Obj.material.shininess);
 
 		// set modelling and normal transformation matrices
     gl.uniformMatrix4fv(Loc.M, gl.FALSE, flatten(modelMatrix));

@@ -60,27 +60,19 @@ window.onload = function init() {
 	gl.uniform3fv( Locations.Is, flatten(Light.Is) );
 
 
-	// set up scene	
-
-	// obj1 = Sphere();
-	// obj1.diffuseMap = "Textures/earth-diffuse.jpg";
-	// obj1.normalMap = "Textures/earth-normal.jpg";
-	// objInit(obj1);
-	// obj1.setModelMatrix(rotateX(90));
-
-
-	pear_tail.diffuseMap = "Textures/pear_diffuse.jpg";
-	pear_tail.normalMap = "Textures/pear_normal_map.jpg";
-	objInit(pear_tail);
+	// set up scene
+	pear_flower.diffuseMap = "Textures/pear_diffuse.jpg";
+	pear_flower.normalMap = "Textures/pear_normal_map.jpg";
+	objInit(pear_flower);
 
 	pear_skin.diffuseMap = "Textures/pear_diffuse.jpg";
 	pear_skin.normalMap = "Textures/pear_normal_map.jpg";
 	pear_skin.specularMap = "Textures/pear_specular.jpg";
 	objInit(pear_skin);
-	
-	pear_flower.diffuseMap = "Textures/pear_diffuse.jpg";
-	pear_flower.normalMap = "Textures/pear_normal_map.jpg";
-	objInit(pear_flower);
+
+	pear_tail.diffuseMap = "Textures/pear_diffuse.jpg";
+	pear_tail.normalMap = "Textures/pear_normal_map.jpg";
+	objInit(pear_tail);
 
 	requestAnimationFrame(render);
 
@@ -104,11 +96,11 @@ function render(now){
 	gl.uniform3fv(Locations.cameraPosition, flatten(cameraPosition));
 
 	gl.uniform1f(Locations.id, 0.0);
-	pear_tail.draw();
+	pear_flower.draw();
 	gl.uniform1f(Locations.id, 1.0);
 	pear_skin.draw();
 	gl.uniform1f(Locations.id, 2.0);
-	pear_flower.draw();
+	pear_tail.draw();
 
 	TB = mat4();
 	gl.uniformMatrix4fv(Locations.TB, gl.FALSE, flatten(TB));
