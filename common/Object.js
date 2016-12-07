@@ -4,7 +4,7 @@ function objInit(Obj){
 	var tBuffer, tanBuffer, bitanBuffer;
 	var modelMatrix = mat4();
 	var normalMatrix = mat3();
-	var diffuseMapTexture, normalMapTexture, heightMapTexture; 
+	var diffuseMapTexture, normalMapTexture, heightMapTexture, specularMapTexture; 
 	
 	var trianglesPresent = (Obj.triangles !== undefined) && (Obj.triangles.length > 0);		
 	var normalsPresent = (Obj.normals!==undefined) && (Obj.normals.length > 0);	
@@ -12,6 +12,7 @@ function objInit(Obj){
 	var usingDiffuseMap = texCoordsPresent && (Obj.diffuseMap!==undefined) && (Obj.diffuseMap!== "");
 	var usingNormalMap = texCoordsPresent && (Obj.normalMap!==undefined) && (Obj.normalMap!== "");
 	var usingHeightMap = texCoordsPresent && (Obj.heightMap!==undefined) && (Obj.heightMap!== "");
+	var usingSpecularMap = texCoordsPresent && (Obj.specularMap!==undefined) && (Obj.specularMap!== "");
 
 	/* get attribute and uniform locations */
 	var Attributes = ["vPosition", "vNormal"];
@@ -19,11 +20,12 @@ function objInit(Obj){
 	if(usingNormalMap) Attributes.push("vTangent", "vBitangent");
 
 	var Uniforms = ["Ka", "Kd", "Ks", "shininess", "M", "N",
-					"usingDiffuseMap", "usingNormalMap", "usingHeightMap"];
+					"usingDiffuseMap", "usingNormalMap", "usingHeightMap", "usingSpecularMap"];
 
 	if(usingDiffuseMap) Uniforms.push("diffuseMapSampler");
 	if(usingNormalMap) Uniforms.push("normalMapSampler");
 	if(usingHeightMap) Uniforms.push("heightMapSampler");
+	if(usingSpecularMap) Uniforms.push("specularMapSampler");
 
 	var Loc = getLocations(Attributes, Uniforms); /* defined in Utils.js */
 
@@ -107,16 +109,25 @@ function objInit(Obj){
 		else{
 			gl.uniform1i(Loc.usingHeightMap, 0);
 		}
+
+		if(usingSpecularMap){
+			gl.activeTexture(gl.TEXTURE3);
+			gl.bindTexture(gl.TEXTURE_2D, specularMapTexture);
+			gl.uniform1i(Loc.usingSpecularMap, 1);
+		}
+		else{
+			gl.uniform1i(Loc.usingSpecularMap, 0);
+		}
 		
 		//set material
 		gl.uniform3fv(Loc.Ka, flatten(Obj.material.Ka));
 		gl.uniform3fv(Loc.Kd, flatten(Obj.material.Kd));
 		gl.uniform3fv(Loc.Ks, flatten(Obj.material.Ks));
-		gl.uniform1f(Loc.shininess, Obj.material.shininess);
+		// gl.uniform1f(Loc.shininess, Obj.material.shininess);
 
 		// set modelling and normal transformation matrices
-	    gl.uniformMatrix4fv(Loc.M, gl.FALSE, flatten(modelMatrix));
-	    gl.uniformMatrix3fv(Loc.N, gl.FALSE, flatten(normalMatrix));
+    gl.uniformMatrix4fv(Loc.M, gl.FALSE, flatten(modelMatrix));
+    gl.uniformMatrix3fv(Loc.N, gl.FALSE, flatten(normalMatrix));
 
 		// Draw
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuffer);
@@ -180,6 +191,11 @@ function objInit(Obj){
 			heightMapTexture = setupTexture(Obj.heightMap);
 			gl.uniform1i(Loc.heightMapSampler, 2);
 		}
+
+		if(usingSpecularMap){
+			specularMapTexture = setupTexture(Obj.specularMap);
+			gl.uniform1i(Loc.specularMapSampler, 3);
+		}		
 	}
 
 	function setupTexture(src){
