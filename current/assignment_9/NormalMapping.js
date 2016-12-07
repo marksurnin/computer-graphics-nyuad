@@ -4,7 +4,7 @@
 var gl, canvas, program;
 
 var camera; 	// camera object
-var trackball; 	// virtual trackball 
+var trackball; 	// virtual trackball
 
 var Locations;  // object containing location ids of shader variables 
 
@@ -74,6 +74,7 @@ window.onload = function init() {
 	pear_tail.normalMap = "Textures/pear_normal_map.jpg";
 	objInit(pear_tail);
 
+
 	requestAnimationFrame(render);
 
 };
@@ -95,11 +96,16 @@ function render(now){
 	var cameraPosition = camera.getFrame().e;
 	gl.uniform3fv(Locations.cameraPosition, flatten(cameraPosition));
 
+	var m = rotateY(now*0.03);
+
 	gl.uniform1f(Locations.id, 0.0);
+	pear_flower.setModelMatrix(m);
 	pear_flower.draw();
 	gl.uniform1f(Locations.id, 1.0);
+	pear_skin.setModelMatrix(m);
 	pear_skin.draw();
 	gl.uniform1f(Locations.id, 2.0);
+	pear_tail.setModelMatrix(m);
 	pear_tail.draw();
 
 	TB = mat4();

@@ -31,19 +31,15 @@ varying vec3 fNormal, fPosition, fTangent, fBitangent;
 varying vec2 fTexCoord;
 
 void main(){
-
 	vec4 wPos = TB*M*vPosition; // world position
-
-	vec4 v = VP*wPos;   
+	vec4 v = VP*wPos;
 	v.z = -v.z; // compensate for left handed coordinate system used by WebGL
 	gl_Position = v;
 
 	fPosition = wPos.xyz;
-
 	fNormal = vNormal;
 	fTangent = vTangent;
 	fBitangent = vBitangent;
-
 	fTexCoord = vTexCoord;
 }
 
@@ -62,7 +58,7 @@ uniform mat3 N, TBN;
 varying vec4 fColor;
 varying vec3 fNormal, fPosition, fTangent, fBitangent;
 varying vec2 fTexCoord;
-vec3 kd, ks;
+vec3 kd;
 
 vec4 computeColor(vec3 position, vec3 normal) {
 	// we are doing lighting in world coordinate frame
@@ -75,7 +71,6 @@ vec4 computeColor(vec3 position, vec3 normal) {
 	if (id == 1.0 && usingSpecularMap == 1) {
 		vec3 specularShininess = texture2D(specularMapSampler, fTexCoord).rgb;
 		newShininess = specularShininess.x*500.0;
-		// ks = texture2D(specularMapSampler, fTexCoord).rgb;
 	}
 
 	vec3 ambient = Ia*Ka ;
