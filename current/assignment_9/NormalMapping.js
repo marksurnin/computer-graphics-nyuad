@@ -39,8 +39,8 @@ window.onload = function init() {
 
 	// set up Camera
 	camera = Camera(); // Camera(...) is defined in Camera.js
-	var eye = vec3(0,0,2);
-	var at = vec3(0, 0 ,0);
+	var eye = vec3(0,2,4);
+	var at = vec3(0,1,0);
 	var up = vec3(0,1,0);
 	camera.lookAt(eye,at,up);
 	camera.setPerspective(90,1,0.1,10);
@@ -48,7 +48,7 @@ window.onload = function init() {
 
 	// set light source
 	var Light = {
-		position: vec3(0,3,5),
+		position: vec3(0,1,8),
 		Ia: vec3(0.3, 0.3, 0.3),
 		Id: vec3(1,1,1),
 		Is: vec3(1,1,1)
