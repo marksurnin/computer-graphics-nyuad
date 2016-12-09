@@ -196,33 +196,37 @@ hitObject hit(Ray ray) {
  * @return {Ray}       ray shot from camera towards each fragment
  */
 Ray pixelRay(float x, float y) {
-  // invert y
-  y = 2.0 - y;
-  // distance to near plane i.e., projection plane
-  float n = 1.0;
-  // width over height
-  float aspect = 1.0;
-  float fov_radians = camera.fov * PI / 180.0;
-  float t = n * tan(fov_radians / 2.0);
-  float r = t * aspect;
-  float b = -t;
-  float l = -r;
+  // // invert y
+  // y = 2.0 - y;
+  // // distance to near plane i.e., projection plane
+  // float n = 1.0;
+  // // width over height
+  // float aspect = 1.0;
+  // float fov_radians = camera.fov * PI / 180.0;
+  // float t = n * tan(fov_radians / 2.0);
+  // float r = t * aspect;
+  // float b = -t;
+  // float l = -r;
 
-  // compute camera basis 
-  vec3 w = normalize(camera.pos - camera.aim);
-  vec3 u = normalize(cross(camera.up, w));
-  vec3 v = cross(w,u);
+  // // compute camera basis 
+  // vec3 w = normalize(camera.pos - camera.aim);
+  // vec3 u = normalize(cross(camera.up, w));
+  // vec3 v = cross(w,u);
 
-  float ucomp = l + (r-l)*(x+0.5)/2.0;
-  float vcomp = b + (t-b)*(y+0.5)/2.0;
-  float wcomp = -n;
+  // float ucomp = l + (r-l)*(x+0.5)/2.0;
+  // float vcomp = b + (t-b)*(y+0.5)/2.0;
+  // float wcomp = -n;
 
-  vec3 raydir = ucomp * u;
-  raydir = raydir + (vcomp * v);
-  raydir = raydir + (wcomp * w);
+  // vec3 raydir = ucomp * u;
+  // raydir = raydir + (vcomp * v);
+  // raydir = raydir + (wcomp * w);
 
-  Ray Saurabh = Ray(camera.pos, normalize(raydir)); //in recognition of our professor Saurabh Ray
-  return Saurabh;
+  // Ray Saurabh = Ray(camera.pos, normalize(raydir)); //in recognition of our professor Saurabh Ray
+  // return Saurabh;
+  vec3 cameraPos = vec3(0.0, 0.0, 5.0);
+  vec3 d = vec3(vec3(fPosition.xy, 0.0) - cameraPos);
+  Ray ray = Ray(cameraPos, normalize(d));
+  return ray;
 }
 
 /**

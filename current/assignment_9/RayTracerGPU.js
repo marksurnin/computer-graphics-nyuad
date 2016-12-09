@@ -36,15 +36,15 @@ window.onload = function init() {
 	Locations = getLocations(Attributes, Uniforms); // defined in Utils.js
 
 	// set up virtual trackball
-	trackball = Trackball(canvas);
+	// trackball = Trackball(canvas);
 
 	// set up Camera
-	camera = Camera(canvas); // Camera(...) is defined in Camera.js
-	var eye = vec3(0,0.9,0);
-	var at = vec3(0, 0 ,0);
-	var up = vec3(0,0,1);
-	camera.lookAt(eye,at,up);
-	camera.setPerspective(90,1,0.1,10);
+	// camera = Camera(canvas); // Camera(...) is defined in Camera.js
+	// var eye = vec3(0,0.9,0);
+	// var at = vec3(0, 0 ,0);
+	// var up = vec3(0,0,1);
+	// camera.lookAt(eye,at,up);
+	// camera.setPerspective(90,1,0.1,10);
 
 	grid = Grid(2);
 	// set material
@@ -84,17 +84,17 @@ function render(now){
 	var time = now/1000;
 	gl.uniform1f(Locations.time, time);
 	
-	var TB = trackballWorldMatrix(trackball,camera);
-	gl.uniformMatrix4fv(Locations.TB, gl.FALSE, flatten(TB));
+	// var TB = trackballWorldMatrix(trackball,camera);
+	// gl.uniformMatrix4fv(Locations.TB, gl.FALSE, flatten(TB));
 
-	var TBN = normalTransformationMatrix(TB);
-	gl.uniformMatrix3fv(Locations.TBN, gl.FALSE, flatten(TBN));
+	// var TBN = normalTransformationMatrix(TB);
+	// gl.uniformMatrix3fv(Locations.TBN, gl.FALSE, flatten(TBN));
 
-	var VP = camera.getMatrix(); 
-	gl.uniformMatrix4fv(Locations.VP, gl.FALSE, flatten(VP));	
+	// var VP = camera.getMatrix(); 
+	// gl.uniformMatrix4fv(Locations.VP, gl.FALSE, flatten(VP));	
 
-	var cameraPosition = camera.getFrame().e;
-	gl.uniform3fv(Locations.cameraPosition, flatten(cameraPosition));
+	// var cameraPosition = camera.getFrame().e;
+	// gl.uniform3fv(Locations.cameraPosition, flatten(cameraPosition));
 
 	grid.draw();
 }
