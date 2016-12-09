@@ -42,33 +42,42 @@ struct Sphere {
   int material_id;
 };
 
-Sphere sphere;
+struct intersectedObject{
+  Sphere sphere;
+  // the point where a ray intersects the sphere
+  vec3 point;
+  // the distance from the ray origin to the spere. -1.0 if no intersection.
+  float distance;
+};
+
 Sphere sphereList[2];
 
-int intersect(Ray ray, Sphere sphere) {
+float intersect(Ray ray, Sphere sphere) {
   float t = -1.0 * (ray.origin.z / ray.direction.z);
   vec3 zPlaneCoordinates = vec3(ray.origin + t * ray.direction);
 
   if ((pow((zPlaneCoordinates.x - sphere.center.x), 2.0) + pow((zPlaneCoordinates.y - sphere.center.y), 2.0)) < pow(sphere.radius, 2.0)) {
-    return 1;
+    return t;
   } else {
-    return 0;
+    return -1.0;
   }
 }
 
-int hit(Ray ray) {
-  int hits = 0;
+intersectedObject hit(Ray ray) {
+  Sphere tempSphere = Sphere(vec3(0.0, 0.0, 0.0), 0.1, 0);
+  vec3 tempPoint = vec3(0.0, 0.0, 0.0);
+  // set the distance to -1.0 (default)
+  intersectedObject object = intersectedObject(tempSphere, tempPoint, -1.0);
+
   for (int i = 0; i < 2; i++) {
-    if (intersect(ray, sphereList[i]) == 1) {
-      hits++;
+    if (intersect(ray, sphereList[i]) > 0.0) {
+      object.sphere = sphereList[i];
+      object.distance = 1.0;
+      // object.point = vec2(ray.origin + t * ray.direction);
     }
   }
 
-  if (hits > 0) {
-    return 1;
-  } else {
-    return 0;
-  }
+  return object;
 }
 
 void main(){
@@ -79,7 +88,7 @@ void main(){
   sphereList[0] = Sphere(vec3(0.0, 0.0, 0.0), 0.3, 0);
   sphereList[1] = Sphere(vec3(0.5, 0.5, 0.0), 0.2, 0);
 
-  if (hit(ray) == 1) {
+  if (hit(ray).distance > 0.0) {
     gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);
   } else {
     gl_FragColor = vec4(0.0, 0.2, 0.0, 1.0);
