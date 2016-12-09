@@ -20,14 +20,6 @@ void main(){
 <script id="fragment-shader" type="x-shader/x-fragment">
 precision mediump float;
 
-uniform vec3 unResolution;
-uniform float time;
-uniform sampler2D tex0;
-uniform sampler2D tex1;
-uniform vec4 unPar;
-uniform vec4 unPos;
-uniform vec4 unBeatBassFFT;
-
 varying vec3 fPosition;
 
 struct Ray {
@@ -42,7 +34,7 @@ struct Sphere {
   int material_id;
 };
 
-struct intersectedObject{
+struct IntersectedObject{
   Sphere sphere;
   // the point where a ray intersects the sphere
   vec3 point;
@@ -53,27 +45,41 @@ struct intersectedObject{
 Sphere sphereList[2];
 
 float intersect(Ray ray, Sphere sphere) {
-  float t = -1.0 * (ray.origin.z / ray.direction.z);
-  vec3 zPlaneCoordinates = vec3(ray.origin + t * ray.direction);
-
-  if ((pow((zPlaneCoordinates.x - sphere.center.x), 2.0) + pow((zPlaneCoordinates.y - sphere.center.y), 2.0)) < pow(sphere.radius, 2.0)) {
-    return t;
+  float distance, t1, t2; //
+  vec3 x = ray.origin - sphere.center; // vec from sphere center to ray origin
+  float A = dot(ray.direction, ray.direction); //size^2
+  float B = 2.0 * dot(x, ray.direction); // 
+  float C = dot(x,x) - sphere.radius * sphere.radius;
+  float D = B*B - 4.0*A*C; //b^2 -4ac
+  distance = 99999.99;
+  if (D >= 0.0){
+    float S = sqrt(D); //sqrt(b^2-4ac)
+    t1 = (-B - S)/(2.0 * A);
+    t2 = (-B + S)/(2.0 * A);
+    if (t1 >= 0.0){
+      distance = t1;
+    }
+    if (t2 >= 0.0 && t2 < t1 ){
+      distance = t2;
+    }
   } else {
-    return -1.0;
+    distance = -1.0;
   }
+  return distance;
 }
 
-intersectedObject hit(Ray ray) {
+IntersectedObject hit(Ray ray) {
   Sphere tempSphere = Sphere(vec3(0.0, 0.0, 0.0), 0.1, 0);
   vec3 tempPoint = vec3(0.0, 0.0, 0.0);
   // set the distance to -1.0 (default)
-  intersectedObject object = intersectedObject(tempSphere, tempPoint, -1.0);
+  IntersectedObject object = IntersectedObject(tempSphere, tempPoint, -1.0);
 
   for (int i = 0; i < 2; i++) {
-    if (intersect(ray, sphereList[i]) > 0.0) {
+    float distanceToObject = intersect(ray, sphereList[i]);
+    if (distanceToObject > 0.0) {
       object.sphere = sphereList[i];
-      object.distance = 1.0;
-      // object.point = vec2(ray.origin + t * ray.direction);
+      object.distance = distanceToObject;
+      object.point = vec3(ray.origin + distanceToObject * ray.direction);
     }
   }
 
@@ -86,10 +92,15 @@ void main(){
   Ray ray = Ray(cameraPos, normalize(d));
 
   sphereList[0] = Sphere(vec3(0.0, 0.0, 0.0), 0.3, 0);
-  sphereList[1] = Sphere(vec3(0.5, 0.5, 0.0), 0.2, 0);
+  sphereList[1] = Sphere(vec3(0.5, 0.5, 0.0), 0.2, 1);
 
-  if (hit(ray).distance > 0.0) {
-    gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+  IntersectedObject intersectedObject = hit(ray);
+  if (intersectedObject.distance > 0.0) {
+    if (intersectedObject.sphere.material_id == 0){
+      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    } else if (intersectedObject.sphere.material_id == 1){
+      gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+    }
   } else {
     gl_FragColor = vec4(0.0, 0.2, 0.0, 1.0);
   }
