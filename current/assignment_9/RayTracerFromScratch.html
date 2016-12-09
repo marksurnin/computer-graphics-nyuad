@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" > 
+
+<title>Draw Square</title>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+precision mediump float;
+
+attribute vec4 vPosition;
+varying vec3 fPosition;
+
+void main(){
+  gl_Position = vPosition;
+  fPosition = vPosition.xyz;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform vec3 unResolution;
+uniform float time;
+uniform sampler2D tex0;
+uniform sampler2D tex1;
+uniform vec4 unPar;
+uniform vec4 unPos;
+uniform vec4 unBeatBassFFT;
+
+varying vec3 fPosition;
+
+struct Ray {
+  vec3 origin;
+  // should always be normalized
+  vec3 direction;
+};
+
+struct Sphere {
+  vec3 center;
+  float radius;
+  int material_id;
+};
+
+Sphere sphere;
+Sphere sphereList[2];
+
+int intersect(Ray ray, Sphere sphere) {
+  float t = -1.0 * (ray.origin.z / ray.direction.z);
+  vec3 zPlaneCoordinates = vec3(ray.origin + t * ray.direction);
+
+  if ((pow((zPlaneCoordinates.x - sphere.center.x), 2.0) + pow((zPlaneCoordinates.y - sphere.center.y), 2.0)) < pow(sphere.radius, 2.0)) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+int hit(Ray ray) {
+  int hits = 0;
+  for (int i = 0; i < 2; i++) {
+    if (intersect(ray, sphereList[i]) == 1) {
+      hits++;
+    }
+  }
+
+  if (hits > 0) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+void main(){
+  vec3 cameraPos = vec3(0.0, 0.0, 5.0);
+  vec3 d = vec3(vec3(fPosition.xy, 0.0) - cameraPos);
+  Ray ray = Ray(cameraPos, normalize(d));
+
+  sphereList[0] = Sphere(vec3(0.0, 0.0, 0.0), 0.3, 0);
+  sphereList[1] = Sphere(vec3(0.5, 0.5, 0.0), 0.2, 0);
+
+  if (hit(ray) == 1) {
+    gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+  } else {
+    gl_FragColor = vec4(0.0, 0.2, 0.0, 1.0);
+  }
+}
+
+</script>
+
+<script type="text/javascript" src="../../common/webgl-utils.js"></script>
+<script type="text/javascript" src="../../common/initShaders.js"></script>
+<script type="text/javascript" src="../../common/MV.js"></script>
+<script type="text/javascript" src="RayTracerFromScratch.js"></script>
+</head>
+
+<body>
+<canvas id="gl-canvas" width="512" height="512">
+  HTML5 Canvas not supported!
+</canvas>
+</body>
+</html>
+
