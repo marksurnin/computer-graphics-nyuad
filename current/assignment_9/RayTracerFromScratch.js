@@ -1,6 +1,7 @@
 "use strict";
 var gl; // global variable
 var ut;
+var diffuseMapTexture;
 
 window.onload = function init(){
   //Set  up WebGL
@@ -29,12 +30,12 @@ window.onload = function init(){
 
   ut = gl.getUniformLocation(program, "time");
   var diffuseMapSampler = gl.getUniformLocation(program, "diffuseMapSampler")
-  //setupTextureMaps
-  var diffuseMapTexture = setupTexture("billiard_ball_texture.jpg"); 
+  // setupTextureMaps
+  diffuseMapTexture = setupTexture("billiard_ball_texture.jpg"); 
   gl.uniform1i(diffuseMapSampler, 0);
-    // we use texture unit 0 for diffuse map
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, diffuseMapTexture);
+  // we use texture unit 0 for diffuse map
+  // gl.activeTexture(gl.TEXTURE0);
+  // gl.bindTexture(gl.TEXTURE_2D, diffuseMapTexture);
   
   //Draw
   requestAnimationFrame(render);
@@ -42,6 +43,9 @@ window.onload = function init(){
 
 function render(now) {
   requestAnimationFrame(render);
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, diffuseMapTexture);
   
   gl.uniform1f(ut, now/1000);
   gl.drawArrays(gl.TRIANGLES,0,6);
