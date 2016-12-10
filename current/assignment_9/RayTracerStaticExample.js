@@ -58,24 +58,30 @@ window.onload = function init() {
 
 function trace(ray, depth){
 
-	var color = background_color; 
-	var h = hit(ray);
+  var finalColor = vec3(0,0,0);
+  var noHit = true;
+  var r = 1;
 
-	if(h.obj!==null){
-		var normal = computeNormal(h.obj, h.point); 
-		var material = Materials[h.obj.material_id];
-		var viewDir = scale(-1, ray.d);
-		color = shade(h.point, normal, viewDir, material);
+  for (var i = 0; i < depth; i++) {
+    var h = hit(ray);
+    if(h.obj!==null){
 
-		if(depth === 0) return color;
-	
-		var reflected_dir = add(ray.d, scale(-2*dot(ray.d, normal),normal)); 
-		var reflected_ray = {e:h.point, d:reflected_dir};
-		var reflected_col = trace( reflected_ray, depth-1);
-	    color = add(color, scale(material.reflectivity, reflected_col));
-	}
-	
-	return color;
+      noHit = false;
+
+      var normal = computeNormal(h.obj, h.point); 
+      var material = Materials[h.obj.material_id];
+      var viewDir = scale(-1, ray.d);
+      color = shade(h.point, normal, viewDir, material);
+
+      var reflected_dir = add(ray.d, scale(-2*dot(ray.d, normal),normal)); 
+      ray = {e:h.point, d:reflected_dir};             // now we consider the reflected ray
+
+      finalColor = add(finalColor, scale(r, color));  // c += r x c_i
+      r *= material.reflectivity;                     // r *= r_i
+    }
+  }
+
+  return noHit ? background_color : finalColor;           // if ray never hit any objects, return bg color
 }
 
 function shade(position, normal, viewDir, material){
