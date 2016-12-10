@@ -18,7 +18,7 @@ void main(){
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment">
-#define PI = 3.14;
+#define PI 3.14159265358979
 precision mediump float;
 
 varying vec3 fPosition;
@@ -133,13 +133,10 @@ vec3 shade(vec3 position, vec3 normal, vec3 viewDir, Material material) {
     //transform cartesian to spherical coordinate
     float theta = atan(y/x);
     float phi = atan(sqrt(x*x + y*y)/z);
-    // textureCoordinates.x = (theta / (2.0 * PI));
-    textureCoordinates.x = (theta / (2.0 * 3.14));
-    // textureCoordinates.x = 3.14;
-    // textureCoordinates.x = 0.1;
-    textureCoordinates.y = (phi + 3.14/2.0) / 3.14;
-    // textureCoordinates = vec2((theta / (2.0 * PI)), (phi + PI/2.0) / PI);
-    final_color = texture2D(diffuseMapSampler, textureCoordinates).xyz;
+    textureCoordinates.x = (theta / (2.0 * PI));
+    textureCoordinates.y = (phi + PI/2.0) / PI;
+
+    final_color = texture2D(diffuseMapSampler, textureCoordinates).rgb;
   }
 
   for (int i = 0; i < 2; i++) {
@@ -251,7 +248,7 @@ void main(){
   materialList[0] = Material(vec3(0.0, 0.2, 0.4), 1.0, 1000.0);
   materialList[1] = Material(vec3(0.0, 0.2, 0.0), 0.8, 1000.0);  
 
-  
+
   gl_FragColor = antiAlias(fPosition, time);
 }
 
